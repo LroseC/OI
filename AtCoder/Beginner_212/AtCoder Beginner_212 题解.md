@@ -343,8 +343,87 @@ signed main(void)
 
 ​	丢一个考场上写一半的代码。
 
+```cpp
+#include <vector>
+#include <cstdio>
+
+using namespace std;
+
+struct Edge
+{
+	int u, v, s, t;
+};
+
+const int N = 1e5 + 10;
+
+int n, m, q;
+Edge edge[N];
+int bus[N];
+vector<int> out[N], in[N];
+
+struct cmps
+{
+	bool operator()(const int &a, const int &b)
+	{
+		return edge[a].s < edge[b].s;
+	}
+};
+struct cmpt
+{
+	bool operator()(const int &a, const int &b)
+	{
+		return edge[a].t > edge[b].t;
+	}
+};
+
+
+int main(void)
+{
+	scanf("%d%d%d", &n, &m, &q);
+	for (int i = 1; i <= m; ++i) {
+		int u, v, s, t;
+		scanf("%d%d%d%d", &u, &v, &s, &t);
+		edge[i] = {u, v, s, t};
+		out[u].push_back(i);
+	}
+	for (int i = 1; i <= m; ++i) bus[i] = i;
+	sort(bus + 1, bus + 1 + m, cmpt);
+	for (int i = 1; i <= n; ++i)
+		sort(out[i].begin(), out[i].end(), cmps());
+
+	for (int i = 1; i <= m; ++i) {
+		int x = bus[i];
+		int u = edge[x].u, v = bus[x].v, s = bus[x].s, t = bus[x].t;
+		edge[x].s = t;
+		int y;
+		iterator<vector<int>> it = lower_bound(out[v].begin(), out[v].end(), x, cmps());
+		if (it != out[v].end()) {
+			y = *it;
+			edge[x].v = edge[y].v;
+		}
+		edge[x].s = s;
+	}
+
+	for (int i = 1; i <= q; ++i) {
+		int x, y, z;
+		scanf("%d%d%d", &x, &y, &z);
 ```
-```
+
+<div style="page-break-after:always"></div>
+
+### G. Power Pair
+
+[题目链接](https://atcoder.jp/contests/abc212/tasks/abc212_g)
+
+##### 没写
+
+<div style="page-break-after:always"></div>
+
+### H. Nim Counting
+
+[题目链接](https://atcoder.jp/contests/abc212/tasks/abc212_h)
+
+##### 也没写
 
 <div style="page-break-after:always"></div>
 
@@ -352,6 +431,6 @@ signed main(void)
 
 ​	我太菜了。
 
-​	其实 $F$ 题好多人跳过了，甚至我刚开始做这题的时候当时的$rank$ $2$ , $rank$ $3$ 全都是只有这题没 $A$ 。
+​	其实 $F$​ 题好多人跳过了，甚至我刚开始做这题的时候当时的$rank$​ $2$​ , $rank$​ $3$​ 全都是只有这题没 $A$​ 。。。
 
 ​	下次一定看榜打比赛。
