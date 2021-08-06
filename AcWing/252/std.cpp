@@ -65,7 +65,7 @@ void DFZ::dfs_getdis(int p, int fa, int d)
 int DFZ::calc(int p, int d)
 {
 	int res = 0;
-	memset(dis, 0, sizeof dis);
+	dis[0] = 0;
 	dfs_getdis(p, 0, d);
 	sort(dis + 1, dis + 1 + dis[0]);
 	int l = 1, r = dis[0];
@@ -85,10 +85,11 @@ int DFZ::dfs(int p)
 	for (int e = head[p]; e; e = nex[e]) {
 		if (vis[to[e]]) continue;
 		ans -= calc(to[e], w[e]);
+	}
+	for (int e = head[p]; e; e = nex[e]) {
+		if (vis[to[e]]) continue;
 		int root, minsize = INT_MAX;
-		dfs_getroot(p, 0, &root, &minsize);
 		all_node = t[to[e]];
-		minsize = INT_MAX;
 		dfs_getroot(to[e], p, &root, &minsize);
 		dfs(root);
 	}
