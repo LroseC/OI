@@ -34,4 +34,8 @@
 # PDF files
 *.pdf
 
+# Example files
+*.in
+*.ans
+
 test.cpp
