@@ -32,9 +32,10 @@ int main(void)
 	// 	else l = tmpl;
 	// }
 	LL maxid = sqrt(n);
-	printf("get(%d) = %d\n", maxid, get(maxid));
 	LL a = maxid;
+	int cnt = 0;
 	for (LL L = 1, R; L <= maxid; L = R + 1) {
+		++cnt;
 		LL l = L;
 		LL r = maxid;
 		LL mid;
@@ -46,9 +47,11 @@ int main(void)
 		R = l;
 		ans = (ans + (R - L + 1) * get(L) % Mod) % Mod;
 	}
+	cnt = 0;
 	for (LL L = maxid + 1, R; L <= n; L = R + 1) {
+		++cnt;
 		if (get(L) == 0) break;
-		LL l = L, r = maxid, mid;
+		LL l = L, r = n, mid;
 		while (l < r) {
 			mid = l + r + 1 >> 1;
 			if (get(mid) == get(L)) l = mid;
