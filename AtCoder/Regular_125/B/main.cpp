@@ -2,7 +2,7 @@
 
 using namespace std;
 
-typedef long long LL;
+typedef __int128 LL;
 const int Mod = 998244353;
 
 LL n;
