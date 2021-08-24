@@ -40,3 +40,4 @@
 *.zip
 
 test.cpp
+/.vscode
