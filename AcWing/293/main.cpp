@@ -162,7 +162,8 @@ signed main(void)
 	int x0;
 	scanf("%lld", &x0);
 	int ans = 0;
-	for (int i = 1, minfroc = 1e12; i <= n; ++i) {
+	double minfroc = 1e12;
+	for (int i = 1; i <= n; ++i) {
 		int da, db;
 		calc(i, x0, da, db);
 		double d = db ? 1.0 * da / db : 1e10;
