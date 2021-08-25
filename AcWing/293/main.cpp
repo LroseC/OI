@@ -5,11 +5,22 @@
 #include <algorithm>
 
 using namespace std;
+#define int long long
+
+struct PIII
+{
+	int x, y, z;
+	PIII(int x, int y, int z) : x(x), y(y), z(z) {}
+	bool operator<(const PIII &b) const
+	{
+		if (x != b.x) return x < b.x;
+		if (y != b.y) return y < b.y;
+		return z < b.z;
+	}
+};
 
 typedef long long LL;
 typedef pair<int, int> PII;
-typedef pair<LL, int> PLI;
-#define int long long
 const int N = 1e5 + 10, M = 17;
 const double eps = 1e-6;
 
@@ -23,12 +34,12 @@ inline int cmpd(double a, double b)
 	return sign(a - b);
 }
 
-int n, m;
-int h[N];
-int ga[N], gb[N];
-int da[N][M][2], db[N][M][2];
+LL n, m;
+LL h[N];
+LL ga[N], gb[N];
+LL da[N][M][2], db[N][M][2];
 set<PII> S;
-int f[N][M][2];
+LL f[N][M][2];
 
 inline void calc(int s, int x, int &a, int &b)
 {
@@ -73,21 +84,21 @@ inline void Init_g(void)
 				ga[i] = it->second;
 			}
 			else {
-				vector<PII> tmp;
+				static vector<PIII> tmp;
 				tmp.clear();
-				tmp.emplace_back(PII({abs(1ll * it->first - h[i]), it->second}));
+				tmp.emplace_back(PIII(abs(1ll * it->first - h[i]), h[it->second],it->second));
 				auto jt = it;
 				++it;
 				if (it != S.end())
-					tmp.emplace_back(PII({abs(1ll * it->first - h[i]), it->second}));
+					tmp.emplace_back(PIII(abs(1ll * it->first - h[i]), h[it->second], it->second));
 				--jt;
-				tmp.emplace_back(PII({abs(1ll * jt->first - h[i]), jt->second}));
+				tmp.emplace_back(PIII(abs(1ll * jt->first - h[i]), h[jt->second], jt->second));
 				if (jt != S.begin()) {
 					--jt;
-					tmp.emplace_back(PII({abs(1ll * jt->first - h[i]), jt->second}));
+					tmp.emplace_back(PIII(abs(1ll * jt->first - h[i]), h[jt->second], jt->second));
 				}
 				sort(tmp.begin(), tmp.end());
-				ga[i] = tmp[1].second;
+				ga[i] = tmp[1].z;
 			}
 		}
 		S.insert({h[i], i});
@@ -146,19 +157,17 @@ signed main(void)
 		if (gb[i] == i) gb[i] = n + 1;
 	}
 	h[n + 1] = 0x3f3f3f3f3f3f3f3f;
-	for (int i = 1; i <= n; ++i) {
-		printf("ga[%d] = %d, gb[%d] = %d\n", i, ga[i], i, gb[i]);
-	}
 	Init_f();
 	Init_d();
 	int x0;
 	scanf("%lld", &x0);
 	int ans = 0;
-	for (int i = 1, minfroc = 1e9; i <= n; ++i) {
+	for (int i = 1, minfroc = 1e12; i <= n; ++i) {
 		int da, db;
 		calc(i, x0, da, db);
-		if ((cmpd(1.0 * da / db, minfroc) < 0) || (!cmpd(1.0 * da / db, minfroc) && h[i] > h[ans])) {
-			minfroc = 1.0 * da / db;
+		double d = db ? 1.0 * da / db : 1e10;
+		if ((cmpd(d, minfroc) < 0) || (!cmpd(d, minfroc) && h[i] > h[ans])) {
+			minfroc = d;
 			ans = i;
 		}
 	}
