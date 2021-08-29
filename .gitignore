@@ -39,6 +39,6 @@
 *.ans
 *.zip
 
-test.cpp
-tmp.cpp
+test.*
+tmp.*
 /.vscode
