@@ -40,4 +40,5 @@
 *.zip
 
 test.cpp
+tmp.cpp
 /.vscode
