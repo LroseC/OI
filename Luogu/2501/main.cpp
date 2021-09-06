@@ -6,7 +6,7 @@
 using namespace std;
 
 typedef long long LL;
-const int N = 3.5e4 + 10;
+const int N = 1e5;
 
 int n;
 LL f[N];
@@ -20,20 +20,22 @@ vector<int> to[N];
 int main(void)
 {
 	scanf("%d", &n);
-	a.resize(n);
-	for (int i = 0; i < n; ++i) scanf("%d", &a[i]);
-	for (int i = 0; i < n; ++i) a[i] -= i;
-	for (int i = 0; i < n; ++i) {
+	a.resize(n + 2);
+	for (int i = 1; i <= n; ++i) scanf("%d", &a[i]);
+	a[n + 1] = 0x3f3f3f3f;
+	for (int i = 1; i <= n; ++i) a[i] -= i;
+	for (int i = 1; i <= n + 1; ++i) {
 		auto it = upper_bound(stk.begin(), stk.end(), a[i]);
-		len[i] = it - stk.begin();
+		len[i] = it - stk.begin() + 1;
 		to[len[i]].emplace_back(i);
 		if (it == stk.end()) stk.emplace_back(a[i]);
 		else *it = a[i];
 	}
-	printf("%d\n", n - stk.size());
+	printf("%d\n", (int)(n - stk.size() + 1));
 	memset(f, 0x3f, sizeof f);
-	to[0].emplace_back(0), f[0] = 0;
-	for (int r = 0; r <= n; ++r) {
+	f[0] = 0; a[0] = 0xcfcfcfcf;
+	to[0].emplace_back(0);
+	for (int r = 1; r <= n + 1; ++r) {
 		for (auto l : to[len[r] - 1]) {
 			if (l > r) break;
 			if (a[l] > a[r]) continue;
@@ -45,9 +47,9 @@ int main(void)
 			for (int i = r - 1; i > l; --i) {
 				sumr[i] = sumr[i + 1] + abs(a[i] - a[r]);
 			}
-			for (int i = l; i < r; ++i) f[r] = min(f[r], f[l] + suml[i] + sumr[i + 1]);
+			for (int i = l; i < r; ++i) f[r] = min(f[r], l == -1 ? 0 : f[l] + suml[i] + sumr[i + 1]);
 		}
 	}
-	printf("%lld\n", f[n]);
+	printf("%lld\n", f[n + 1]);
 	return 0;
 }
