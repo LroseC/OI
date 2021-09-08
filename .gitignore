@@ -39,7 +39,6 @@
 *.ans
 *.zip
 
-New.sh
 test.*
 tmp.*
 /.vscode
