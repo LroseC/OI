@@ -1,5 +1,5 @@
 #!/bin/bash
-read last < ./test.bk
+read last < ./New
 git add ./$last
 git commit -m "Luogu_$last"
 read name
