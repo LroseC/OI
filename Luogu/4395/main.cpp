@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <cctype>
 #include <cstdio>
@@ -13,30 +14,41 @@ inline int read(void)
 	return res * f;
 }
 
+const int INF = 1e8;
 const int N = 1e4 + 10;
 
-int n;
+int n, m;
 vector<int> G[N];
-int f[N][1010];
+int f[N][20];
 
 void dfs(int u, int fa)
 {
-	f[u][0] = 1, f[u][1] = 2;
+	for (int i = 1; i <= m; ++i) f[u][i] = i;
 	for (int v : G[u]) {
 		if (v == fa) continue;
 		dfs(v, u);
+		for (int i = 1; i <= m; ++i) {
+			int minx = INF;
+			for (int j = 1; j <= m; ++j)
+				if (j != i)
+					minx = min(minx, f[v][j]);
+			f[u][i] += minx;
+		}
 	}
 }
 
 int main(void)
 {
-	n = read();
+	n = read(); m = log2(n);
 	for (int i = 1; i < n; ++i) {
 		int u = read(), v = read();
 		G[u].emplace_back(v);
 		G[v].emplace_back(u);
 	}
 	dfs(1, -1);
-	printf("%d\n", min(f[1][0], f[1][1]));
+	int res = INF;
+	for (int i = 1; i <= m; ++i)
+		res = min(res, f[1][i]);
+	printf("%d\n", res);
 	return 0;
 }
