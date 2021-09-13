@@ -46,12 +46,9 @@ void dfs(int u, int fa)
 {
 	sz[u] = 1;
 	f[u][0][0][0] = f[u][1][1][0] = 1;
-	f[u][1][1][0] = 1;
 	for (int v : G[u]) {
 		if (v == fa) continue;
 		dfs(v, u);
-
-		sz[u] += sz[v];
 
 		for (int i = 0; i <= min(sz[u], m); ++i)
 			for (int p = 0; p < 2; ++p)
@@ -60,13 +57,14 @@ void dfs(int u, int fa)
 					f[u][i][p][q] = 0;
 				}
 
-		for (int j = min(sz[u], m); j >= 0; --j)
-			for (int k = min(sz[v], j); k >= 0; --k) {
-				f[u][j][0][0] = ((LL)f[u][j][0][0] + 1ll * g[j - k][0][0] * f[v][k][0][1] % Mod) % Mod;
-				f[u][j][0][1] = ((LL)f[u][j][0][1] + (1ll * g[j - k][0][0] * f[v][k][1][1] % Mod + 1ll * g[j - k][0][1] * ((LL)f[v][k][0][1] + f[v][k][1][1])) % Mod) % Mod;
-				f[u][j][1][0] = ((LL)f[u][j][1][0] + 1ll * g[j - k][1][0] * (f[v][k][0][0] + f[v][k][0][1]) % Mod) % Mod;
-				f[u][j][1][1] = ((LL)f[u][j][1][1] + (1ll * g[j - k][1][0] * ((LL)f[v][k][1][0] + f[v][k][1][1]) % Mod + 1ll * g[j - k][1][1] * ((LL)f[v][k][0][0] + f[v][k][0][1] + f[v][k][1][0] + f[v][k][1][1]) % Mod) % Mod) % Mod;
+		for (int j = 0; j <= min(sz[u], m); ++j)
+			for (int k = 0; k <= min(sz[v],m - j); ++k) {
+				f[u][j + k][0][0] = ((LL)f[u][j + k][0][0] + 1ll * g[j][0][0] * f[v][k][0][1] % Mod) % Mod;
+				f[u][j + k][0][1] = ((LL)f[u][j + k][0][1] + (1ll * g[j][0][0] * f[v][k][1][1] % Mod + 1ll * g[j][0][1] * ((LL)f[v][k][0][1] + f[v][k][1][1])) % Mod) % Mod;
+				f[u][j + k][1][0] = ((LL)f[u][j + k][1][0] + 1ll * g[j][1][0] * (f[v][k][0][0] + f[v][k][0][1]) % Mod) % Mod;
+				f[u][j + k][1][1] = ((LL)f[u][j + k][1][1] + (1ll * g[j][1][0] * ((LL)f[v][k][1][0] + f[v][k][1][1]) % Mod + 1ll * g[j][1][1] * ((LL)f[v][k][0][0] + f[v][k][0][1] + f[v][k][1][0] + f[v][k][1][1]) % Mod) % Mod) % Mod;
 			}
+		sz[u] += sz[v];
 	}
 }
 
