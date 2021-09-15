@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define DEBUG
+// #define DEBUG
 const int INF = 0x3f3f3f3f;
 inline int lowbit(int x) { return x & -x; }
 inline int get_cnt(int x)
@@ -25,7 +25,7 @@ inline int read(void)
 
 int n, m;
 int f[1 << 20];
-int fa[1 << 20];
+bool vis[1 << 20];
 int g[1 << 20];
 int a[12][12];
 int b[12][12];
@@ -39,7 +39,8 @@ void Print(int x)
 
 int dp(int state)
 {
-	if (~f[state]) return f[state];
+	if (vis[state]) return f[state];
+	vis[state] = 1;
 	int tot = 0;
 	for (int i = 0, h = n; i < n + m; ++i) {
 		if (state >> i & 1) --h;
@@ -47,33 +48,31 @@ int dp(int state)
 	}
 	g[state] = tot;
 
-	if (tot & 1) f[state] = -INF;
-	else f[state] = INF;
+	if (tot & 1) f[state] = INF;
+	else f[state] = -INF;
 
-	for (int i = 0, r = n - 1, c = -1, last = 2; i < n + m; ++i) {
+	for (int i = 0, r = n, c = -1, last = 2; i < n + m; ++i) {
 		if (state >> i & 1) {
-			if (last == 0) {
-				int statep = state ^ (1 << i) ^ (1 << i - 1);
-				dp(statep);
-
-				if (tot & 1)
-					f[state] = max(f[state], f[statep] + a[r][c]);
-				else
-					f[state] = min(f[state], f[statep] - b[r][c]);
-
-				#ifdef DEBUG
-				printf("state = "), Print(state), putchar('\n');
-				printf("f["), Print(state), printf("] = %d\n", f[state]);
-				printf("f["), Print(statep), printf("] = %d\n", f[statep]);
-				printf("a[%d][%d] = %d, b[%d][%d] = %d\n", r, c, a[r][c], r, c, b[r][c]);
-				#endif
-			}
 			last = 1;
 			--r;
 		}
 		else {
-			last = 0;
 			++c;
+			if (last == 1) {
+				int statep = state ^ (1 << i) ^ (1 << i - 1);
+				dp(statep);
+				if (tot & 1) f[state] = min(f[state], f[statep] - b[r][c]);
+				else f[state] = max(f[state], f[statep] + a[r][c]);
+				#ifdef DEBUG
+				if (state == 20) {
+					printf("f["), Print(state), printf("] = %d\n", f[state]);
+					printf("statep = "), Print(statep), putchar('\n');
+					printf("f["), Print(statep), printf("] = %d\n", f[statep]);
+					printf("tot = %d\n", tot);
+				}
+				#endif
+			}
+			last = 0;
 		}
 	}
 	return f[state];
@@ -83,16 +82,16 @@ int main(void)
 {
 	n = read(), m = read();
 	memset(f, -1, sizeof f);
-	memset(fa, -1, sizeof fa);
 	for (int i = 0; i < n; ++i)
 		for (int j = 0; j < m; ++j)
 			a[i][j] = read();
 	for (int i = 0; i < n; ++i)
 		for (int j = 0; j < m; ++j)
-			b[i][j] -= read();
+			b[i][j] = read();
 
-	f[(1 << n) - 1] = 0;
-	printf("%d\n", dp(((1 << n) - 1) << m));
+	f[((1 << n) - 1) << m] = 0;
+	vis[((1 << n) - 1) << m] = 1;
+	printf("%d\n", dp((1 << n) - 1));
 
 	#ifdef DEBUG
 	for (int i = 0; i < 1 << n + m; ++i) {
