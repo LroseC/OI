@@ -1,4 +1,5 @@
 #include <set>
+#include <vector>
 #include <cctype>
 #include <cstdio>
 #include <algorithm>
@@ -41,19 +42,33 @@ void GetNex(void)
 		auto jt = it;
 		for (int j = 0; j < 2; ++j)
 			if (it != S.end()) {
-				tmp.emplace_back({abs(it->first - h[i]), it->second});
+				tmp.emplace_back(PII({abs(it->first - h[i]), it->second}));
 				++it;
 			}
 		for (int j = 0; j < 2; ++j)
 			if (jt != S.begin()) {
 				--jt;
-				tmp.emplace_back({abs(jt->first - h[i]), jt->second});
+				tmp.emplace_back(PII({abs(jt->first - h[i]), jt->second}));
 			}
-		sort(tmp.begin(), tmp.end(), cmp)
-		if (tmp.size() > 1) nex[0][i] = tmp[1]->second;
-		if (tmp.size() > 0) nex[1][i] = tmp[0]->second;
+		sort(tmp.begin(), tmp.end(), cmp);
+		if (tmp.size() > 1) nex[0][i] = tmp[1].second;
+		if (tmp.size() > 0) nex[1][i] = tmp[0].second;
 		S.insert({h[i], i});
 	}
+}
+PLL Solve(int stcity, int maxdis) //Get how far will A and B go from stcity with the limit of maxdis
+{
+	PLL res = {0, 0};
+	int now = stcity, nowdis = 0;
+	for (int k = M - 1; k >= 0; --k) {
+		if (f[0][now][k] && nowdis + dis[0][0][now][k] + dis[0][1][now][k] <= maxdis) {
+			res.first += dis[0][0][now][k];
+			res.second += dis[0][1][now][k];
+			nowdis += dis[0][0][now][k] + dis[0][1][now][k];
+			now = f[0][now][k];
+		}
+	}
+	return res;
 }
 
 int main(void)
@@ -65,14 +80,14 @@ int main(void)
 	for (int i = 1; i <= n; ++i) {
 		f[0][i][0] = nex[0][i];
 		f[1][i][0] = nex[1][i];
-		if (!nex[0][i]) dis[0][0][i][0] = abs(h[nex[0][i]] - h[i]);
-		if (!nex[1][i]) dis[1][1][i][0] = abs(h[nex[1][i]] - h[i]);
+		if (nex[0][i]) dis[0][0][i][0] = abs(h[nex[0][i]] - h[i]);
+		if (nex[1][i]) dis[1][1][i][0] = abs(h[nex[1][i]] - h[i]);
 	}
 	for (int k = 1; k < M; ++k)
 		for (int i = 1; i <= n; ++i) {
 			if (k == 1) {
-				f[0][i][k] = f[0][f[1][i][k - 1]][k - 1];
-				f[1][i][k] = f[1][f[0][i][k - 1]][k - 1];
+				f[0][i][k] = f[1][f[0][i][k - 1]][k - 1];
+				f[1][i][k] = f[0][f[1][i][k - 1]][k - 1];
 			}
 			else {
 				f[0][i][k] = f[0][f[0][i][k - 1]][k - 1];
