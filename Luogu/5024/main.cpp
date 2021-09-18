@@ -21,9 +21,10 @@ int w[N];
 char type[5];
 int dep[N];
 int fa[N][M];
-int f[N][2];
-int invf[N][2];
-int g[N][M][2][2];
+LL f[N][2];
+LL sum[N][2];
+LL invf[N][2];
+LL g[N][M][2][2];
 vector<int> G[N];
 
 void dfs(int u, int father, int depth)
@@ -55,6 +56,40 @@ void GetInv(int u, int father)
 }
 void GetG(void)
 {
+	memset(g, 0x3f, sizeof g);
+	for (int i = 1; i <= n; ++i) {
+		g[i][0][0][0] = 0x3f3f3f3f;
+		g[i][0][0][1] = f[fa[i][0]][1] - min(f[i][0], f[i][1]);
+		g[i][0][1][0] = f[fa[i][1]][0] - f[i][1];
+		g[i][0][1][1] = f[fa[i][0]][1] - min(f[i][0], f[i][1]);
+	}
+	for (int k = 1; k < M; ++k)
+		for (int i = 1; i <= n; ++i)
+			for (int p = 0; p < 2; ++p)
+				for (int q = 0; q < 2; ++q)
+					for (int t = 0; t < 2; ++t)
+						g[i][k][p][q] = min(g[i][k][p][q], g[i][k - 1][p][t] + g[fa[i][k - 1]][k - 1][t][q]);
+}
+LL Solve(int a, int b, int x, int y)
+{
+	int u = a, v = b;
+	sum[a][x] = f[a][x]; sum[b][y] = f[b][y];
+	sum[a][!x] = sum[b][!y] = 0x3f3f3f3f;
+	for (int k = 16; k >= 0; --k) {
+		int F = fa[u][k];
+		if (dep[F] >= dep[v]) {
+			sum[F][0] = min(sum[u][0] + g[u][k][0][0], sum[u][1] + g[u][k][1][0]);
+			sum[F][1] = min(sum[u][0] + g[u][k][0][1], sum[u][1] + g[u][k][1][1]);
+			u = F;
+		}
+	}
+	if (u == v) return sum[v][y];
+	for (int k = 16; k >= 0; --k) {
+		int F1 = fa[u][k], F2 = fa[v][k];
+		if (F1 != F2) {
+			sum
+		}
+	}
 }
 
 int main(void)
@@ -71,42 +106,10 @@ int main(void)
 	GetFa();
 	GetInv(1, -1);
 	GetG();
-
 	while (m--) {
-		//先求 lca
-		int u = read(), x = read(), v = read(), y = read();
-		if (dep[u] < dep[v]) swap(u, v), swap(x, y);
-		int uu = u, vv = v;
-		for (int k = 16; k >= 0; --k)
-			if (fa[uu][k] && dep[fa[uu][k]] <= dep[vv]) uu = fa[uu][k];
-		for (int k = 16; k >= 0; --k)
-			if (fa[uu][k] != fa[vv][k]) uu = fa[uu][k], vv = fa[vv][k];
-		int lca = fa[uu][0];
-		//然后按照要求倍增转移到 lca，两种情况取 min
-		uu = u, vv = v;
-		sum[u][x] = f[u][x]; sum[v][y] = f[v][y];
-		for (int k = 16; k >= 0; --k) {
-			if (dep[fa[uu][k]] < lca)
-				for (int q = 0, flag = 1; q < 2; ++q)
-					for (int p = 0; p < 2; ++p)
-						if (uu != u || p == x) {
-							if (flag) sum[fa[uu][k]][q] = sum[uu][p] + g[uu][k][p][q], flag = 0;
-							else sum[fa[uu][k]][q] = min(sum[fa[uu][k]][q], sum[uu][p] + g[uu][k][p][q]);
-						}
-			if (dep[fa[vv][k]] < lca)
-				for (int q = 0; flag = 1; q < 2; ++q)
-					for (int p = 0; p < 2; ++p)
-						if (vv != v || p == y) {
-							if (flag) sum[fa[vv][k]][q] = sum[vv][p] + g[vv][k][q][p], flag = 0;
-							else sum[fa[vv][k]][q] = min(sum[fa[vv][k]][q], sum[vv][p] + g[vv][k][p][q]);
-						}
-		}
-		LL ans = 0x3f3f3f3f3f3f3f3f;
-		for (int i = 0; i < 2; ++i)
-			for (int q = 0; q < 2; ++q)
-				for (int p = 0; p < 2; ++p)
-					ans = min(ans, sum[uu][q] + g[uu][0][q][i] + sum[vv][p] + g[vv][0][p][i] + ndp[lca][i]);
-		printf("%lld\n", ans);
+		int a = read(), x = read(), b = read(), y = read();
+		if (dep[a] < dep[b]) swap(a, b), swap(x, y);
+		printf("%lld\n", Solve(a, b, x, y));
 	}
 	return 0;
 }
