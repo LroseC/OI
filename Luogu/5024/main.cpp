@@ -6,6 +6,7 @@
 
 using namespace std;
 
+#define int long long
 typedef long long LL;
 const int N = 1e5 + 10, M = 17;
 inline int read(void)
@@ -49,7 +50,7 @@ void GetInv(int u, int father)
 {
 	for (int v : G[u]) {
 		if (v == father) continue;
-		invf[v][0] = invf[u][1] + invf[u][1] - min(f[v][0], f[v][1]);
+		invf[v][0] = invf[u][1] + f[u][1] - min(f[v][0], f[v][1]);
 		invf[v][1] = min(invf[v][0], invf[u][0] + f[u][0] - f[v][1]);
 		GetInv(v, u);
 	}
@@ -58,9 +59,9 @@ void GetG(void)
 {
 	memset(g, 0x3f, sizeof g);
 	for (int i = 1; i <= n; ++i) {
-		g[i][0][0][0] = 0x3f3f3f3f;
+		g[i][0][0][0] = 0x3f3f3f3f3f3f3f3f;
 		g[i][0][0][1] = f[fa[i][0]][1] - min(f[i][0], f[i][1]);
-		g[i][0][1][0] = f[fa[i][1]][0] - f[i][1];
+		g[i][0][1][0] = f[fa[i][0]][0] - f[i][1];
 		g[i][0][1][1] = f[fa[i][0]][1] - min(f[i][0], f[i][1]);
 	}
 	for (int k = 1; k < M; ++k)
@@ -70,11 +71,18 @@ void GetG(void)
 					for (int t = 0; t < 2; ++t)
 						g[i][k][p][q] = min(g[i][k][p][q], g[i][k - 1][p][t] + g[fa[i][k - 1]][k - 1][t][q]);
 }
+bool check(int u, int v)
+{
+	for (int x : G[u]) {
+		if (x == v) return 1;
+	}
+	return 0;
+}
 LL Solve(int a, int b, int x, int y)
 {
 	int u = a, v = b;
 	sum[a][x] = f[a][x]; sum[b][y] = f[b][y];
-	sum[a][!x] = sum[b][!y] = 0x3f3f3f3f;
+	sum[a][1 - x] = sum[b][1 - y] = 0x3f3f3f3f3f3f3f3f;
 	for (int k = 16; k >= 0; --k) {
 		int F = fa[u][k];
 		if (dep[F] >= dep[v]) {
@@ -83,16 +91,24 @@ LL Solve(int a, int b, int x, int y)
 			u = F;
 		}
 	}
-	if (u == v) return sum[v][y];
+	if (u == v) return sum[b][y] + invf[b][y];
 	for (int k = 16; k >= 0; --k) {
 		int F1 = fa[u][k], F2 = fa[v][k];
 		if (F1 != F2) {
-			sum
+			sum[F1][0] = min(sum[u][0] + g[u][k][0][0], sum[u][1] + g[u][k][1][0]);
+			sum[F1][0] = min(sum[u][0] + g[u][k][0][0], sum[u][1] + g[u][k][1][0]);
+			sum[F2][1] = min(sum[v][0] + g[v][k][0][1], sum[v][1] + g[v][k][1][1]);
+			sum[F2][1] = min(sum[v][0] + g[v][k][0][1], sum[v][1] + g[v][k][1][1]);
+			u = F1; v = F2;
 		}
 	}
+	int lca = fa[u][0];
+	LL ans0 = f[lca][0] - f[u][1] - f[v][1] + (sum[u][1] + sum[v][1] + invf[lca][0]);
+	LL ans1 = f[lca][1] - min(f[u][0], f[u][1]) - min(f[v][0], f[v][1]) + min(sum[u][0], sum[u][1]) + min(sum[v][0], sum[v][1]) + invf[lca][1];
+	return min(ans0, ans1);
 }
 
-int main(void)
+signed main(void)
 {
 	n = read(), m = read();
 	scanf("%s", type);
@@ -109,7 +125,8 @@ int main(void)
 	while (m--) {
 		int a = read(), x = read(), b = read(), y = read();
 		if (dep[a] < dep[b]) swap(a, b), swap(x, y);
-		printf("%lld\n", Solve(a, b, x, y));
+		if (!(x || y) && check(a, b)) puts("-1");
+		else printf("%lld\n", Solve(a, b, x, y));
 	}
 	return 0;
 }
