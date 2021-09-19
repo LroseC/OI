@@ -96,8 +96,8 @@ LL Solve(int a, int b, int x, int y)
 		int F1 = fa[u][k], F2 = fa[v][k];
 		if (F1 != F2) {
 			sum[F1][0] = min(sum[u][0] + g[u][k][0][0], sum[u][1] + g[u][k][1][0]);
-			sum[F1][0] = min(sum[u][0] + g[u][k][0][0], sum[u][1] + g[u][k][1][0]);
-			sum[F2][1] = min(sum[v][0] + g[v][k][0][1], sum[v][1] + g[v][k][1][1]);
+			sum[F1][1] = min(sum[u][0] + g[u][k][0][1], sum[u][1] + g[u][k][1][1]);
+			sum[F2][0] = min(sum[v][0] + g[v][k][0][0], sum[v][1] + g[v][k][1][0]);
 			sum[F2][1] = min(sum[v][0] + g[v][k][0][1], sum[v][1] + g[v][k][1][1]);
 			u = F1; v = F2;
 		}
