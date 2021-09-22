@@ -1,11 +1,15 @@
 #include <vector>
 #include <cctype>
 #include <cstdio>
+#include <cstring>
+#include <iostream>
 #include <algorithm>
 
 using namespace std;
 
+const int N = 2e5 + 10;
 typedef pair<int, int> PII;
+inline int lowbit(int x) { return x & -x; }
 
 inline int read(void)
 {
@@ -16,24 +20,41 @@ inline int read(void)
 }
 
 int n, m;
-vector<int> a;
-vector<int> b;
-vector<PII> tmp;
+int f[N];
+int tr[N];
+int ans = 0;
+vector<int> ed[N];
+vector<int> tmp[N];
+
+void add(int k, int val)
+{
+	for (int i = k; i < N; i += lowbit(i)) tr[i] = max(tr[i], val);
+}
+int query(int k)
+{
+	int res = 0;
+	for (int i = k; i; i -= lowbit(i)) res = max(res, tr[i]);
+	return res;
+}
 
 int main(void)
 {
-	n = read(), m = read();
-	while (m--) {
-		int a = read(), b = read();
-		tmp.emplace_back(PII({a, b}));
+	ios::sync_with_stdio(0);
+	cin >> n >> m;
+	for (int i = 1; i <= m; ++i) {
+		int a, b;
+		cin >> a >> b;
+		ed[a].emplace_back(b);
 	}
-	sort(tmp.begin(), tmp.end());
-	for (auto t : tmp) a.emplace_back(t.second);
-	for (int x : a) {
-		auto it = lower_bound(b.begin(), b.end(), x);
-		if (it == b.end()) b.emplace_back(x);
-		else *it = x;
+	for (int i = 1; i <= n; ++i) {
+		tmp[i].resize(ed[i].size());
+		for (int j = 0; j < ed[i].size(); ++j) {
+			tmp[i][j] = query(ed[i][j] - 1) + 1;
+			ans = max(ans, tmp[i][j]);
+		}
+		for (int j = 0; j < ed[i].size(); ++j)
+			add(ed[i][j], tmp[i][j]);
 	}
-	printf("%d\n", b.size());
+	cout << ans << endl;
 	return 0;
 }
