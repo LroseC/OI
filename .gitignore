@@ -42,3 +42,4 @@
 test.*
 tmp.*
 /.vscode
+/tmp
