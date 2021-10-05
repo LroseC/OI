@@ -24,16 +24,18 @@ void dfs(int n, ULL k)
 	}
 	if (k >> n & 1) {
 		putchar('1');
-		dfs(n - 1, (1 << n + 1) - k);
+		dfs(n - 1, ((ULL)1 << n) - k - 1 + ((ULL)1 << n));
 	}
 	else {
-		dfs(n - 1, k);
 		putchar('0');
+		dfs(n - 1, k);
 	}
 }
 
 int main(void)
 {
 	n = read(), k = read();
-	dfs(n - 1, k);
+	// for (int i = 0; i < 1 << n; ++i, puts("")) dfs(n - 1, i);
+	dfs(n - 1, k); puts("");
+	return 0;
 }
