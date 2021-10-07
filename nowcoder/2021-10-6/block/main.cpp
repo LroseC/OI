@@ -83,7 +83,10 @@ int main(void)
 				if (gcd(dx, dy == 1)) {
 					for (int i = 0; i < dx; ++i)
 						for (int j = 0; j <= Y; ++j) {
-							dfs(i, j, dx, dy, -1000, -1000, 0, ans);
+							int a = ceil(sqrt(1.0 * sq(d) / (sq(dx) + sq(dy))));
+							int pointcnt = (X - i) / dx;
+							ans += C(pointcnt - (n - 1) * a, n);
+							// dfs(i, j, dx, dy, -1000, -1000, 0, ans);
 						}
 					for (int i = dx; i <= X; ++i)
 						for (int j = 0; j < dy; ++j) {
