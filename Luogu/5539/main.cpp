@@ -1,9 +1,12 @@
 #include <cctype>
 #include <cstdio>
+#include <cstring>
 
 using namespace std;
 
-typedef long long LL;
+typedef unsigned long long ULL;
+const int N = 1e9 + 10;
+inline ULL lowbit(ULL x) { return x & -x; }
 
 inline int read(void)
 {
@@ -13,47 +16,66 @@ inline int read(void)
 	return res * f;
 }
 template<typename T>
-void write(T x, char end = '\n')
+inline void write(T x, char end = '\n')
 {
-	static char buf[50]; int p = -1;
+	static char buf[100]; int p = -1;
 	if (x == 0) putchar('0');
 	if (x < 0) { putchar('-'); x = -x; }
 	while (x) { buf[++p] = x % 10; x /= 10; }
 	while (~p) { putchar(buf[p] + '0'); --p; } putchar(end);
 }
-
-int s[50];
-
-LL exgcd(LL a, LL b, LL &x, LL &y)
+template<typename T>
+inline void write2(T x, char end = '\n')
 {
-	if (!b) { x = 1, y = 0; return a; }
-	int d = exgcd(b, a % b, y, x);
-	y -= a / b * x; return d;
+	static char buf[130]; int p = -1;
+	while (x) { buf[++p] = x & 1; x >>= 1; }
+	while (~p) { putchar(buf[p] + '0'); --p; } putchar(end);
+}
+
+inline int count(ULL x)
+{
+	int res = 0;
+	while (x) {
+		++res;
+		x -= lowbit(x);
+	}
+	return res;
+}
+
+int n, m, S;
+ULL val[(N >> 6) + 10];
+
+void insert(int x)
+{
+	if (x < 64) {
+	static ULL tmp[70];
+		memset(tmp, 0, sizeof tmp);
+		for (int i = 0; i < (x << 6); i += x)
+			tmp[i >> 6] |= 1ull << (i & 63);
+		for (int i = 0; i <= m; i += x)
+			for (int j = 0; j < x && i + j <= m; ++j)
+				val[i + j] |= tmp[j];
+	}
+	else {
+		for (int i = 0; i <= n; i += x)
+			val[i >> 6] |= 1ull << (i & 63);
+	}
+}
+int query(void)
+{
+	--m; int res = 0;
+	if ((n & 63) != 63) val[m] &= (1ull << (n + 1 - (m << 6))) - 1;
+	val[0] &= -2ull;
+	for (int i = 0; i <= m; ++i) res += count(val[i] & (val[i] << 1) & (val[i] << 2));
+	for (int i = 1; i <= m; ++i) res += count(val[i] & (val[i - 1] >> 62) & ((val[i - 1] >> 63) | (val[i] << 1)));
+	return res;
 }
 
 int main(void)
 {
-	int n = read(), m = read();
-	for (int i = 1; i <= m; ++i) s[i] = read();
-	int p[10];
-	int a[4] = {0, 0, 1, 2};
-	LL ans = 0;
-	for (p[1] = 1; p[1] <= m; ++p[1])
-		for (p[2] = 1; p[2] <= m; ++p[2])
-			for (p[3] = 1; p[3] <= m; ++p[3]) {
-				bool fail = 0;
-				LL t = 0, M = 1;
-				for (int i = 1; i <= 3; ++i) {
-					LL x, y;
-					LL d = exgcd(M, p[i], x, y);
-					if ((a[i] - t) % d) { fail = 1; break; }
-					t += 1ll * x * M;
-					M = 1ll * M * (p[i] / d);
-					t = (t % M + M) % M;
-				}
-				if (fail) continue;
-				ans += ((n - t) / M) - ((3 - t - 1) / M + 1) + 1;
-			}
-	printf("%lld\n", ans);
+	n = read(), S = read();
+	m = (n >> 6) + 1;
+	while (S--) insert(read());
+	write(query());
 	return 0;
 }
