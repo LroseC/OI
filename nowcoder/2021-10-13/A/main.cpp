@@ -74,19 +74,13 @@ inline int work(void)
 
 		for (int i = 1; i <= n; ++i) {
 			auto it = S.end(); --it;
-			if (i > 1 && it->second == a[i - 1] && it != S.begin()) {
+			if (it->second == a[i - 1] && it != S.begin()) {
 				--it;
-				auto tmp = *it; S.erase(it);
-				a[i] = tmp.second;
-				--tmp.first;
-				if (tmp.first) S.insert(tmp);
 			}
-			else {
-				auto tmp = *it; S.erase(it);
-				a[i] = tmp.second;
-				--tmp.first;
-				if (tmp.first) S.insert(tmp);
-			}
+			auto tmp = *it; S.erase(it);
+			a[i] = tmp.second;
+			--tmp.first;
+			if (tmp.first) S.insert(tmp);
 		}
 		bool fail = 0;
 		for (int i = 1; i <= n; ++i)
