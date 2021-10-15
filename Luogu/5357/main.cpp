@@ -8,9 +8,12 @@ using namespace std;
 const int N = 2e5 + 10;
 
 int n;
+vector<int> invG[N];
+int inedge[N];
 vector<int> ed[N];
 int idx, fail[N], ch[N][26];
 int cnt[N];
+int ans[N];
 char str[(int)2e6 + 10];
 
 void initnode(int u)
@@ -54,10 +57,28 @@ void query(char str[])
 	int u = 0;
 	for (int i = 0; str[i]; ++i) {
 		u = ch[u][str[i] - 'a'];
-		for (int j = u; j; j = fail[j]) {
-			if (ed[j].size())
-				for (auto t : ed[j])
-					++cnt[t];
+		++cnt[u];
+		// for (int j = u; j; j = fail[j])
+		// 	++cnt[j];
+	}
+}
+void toposort(void)
+{
+	static queue<int> q;
+	while (q.size()) q.pop();
+	for (int i = 0; i <= idx; ++i) {
+		++inedge[fail[i]];
+		invG[i].emplace_back(fail[i]);
+	}
+	for (int i = 1; i <= idx; ++i) {
+		if (inedge[i] == 0) q.emplace(i);
+	}
+	while (q.size()) {
+		int u = q.front(); q.pop();
+		for (auto v : invG[u]) {
+			--inedge[v];
+			cnt[v] += cnt[u];
+			if (inedge[v] == 0) q.emplace(v);
 		}
 	}
 }
@@ -75,8 +96,11 @@ int main(void)
 	build();
 	scanf("%s", str);
 	query(str);
-	int maxcnt = 0;
+	toposort();
+	for (int i = 1; i <= idx; ++i)
+		for (auto x : ed[i])
+			ans[x] = cnt[i];
 	for (int i = 1; i <= n; ++i)
-		printf("%d\n", cnt[i]);
+		printf("%d\n", ans[i]);
 	return 0;
 }
