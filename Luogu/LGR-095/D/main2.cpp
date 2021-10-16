@@ -80,6 +80,18 @@ inline int BFS(void)
 							heap.emplace((dis + a));
 						}
 					}
+					else {
+						for (dd = 0; dd < 2; ++dd) {
+							xx = t.x + gox[dd];
+							yy = t.y + goy[dd];
+							if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+							q[(u + a) % D].emplace(Node(xx, yy, dd));
+							if (!vis[(u + a) % D]) {
+								vis[(u + a) % D] = 1;
+								heap.emplace((dis + a));
+							}
+						}
+					}
 					break;
 				case '-':
 					if (t.dir >= 2) {
@@ -90,6 +102,18 @@ inline int BFS(void)
 						if (!vis[(u + a) % D]) {
 							vis[(u + a) % D] = 1;
 							heap.emplace((dis + a));
+						}
+					}
+					else {
+						for (dd = 2; dd < 3; ++dd) {
+							xx = t.x + gox[dd];
+							yy = t.y + goy[dd];
+							if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+							q[(u + a) % D].emplace(Node(xx, yy, dd));
+							if (!vis[(u + a) % D]) {
+								vis[(u + a) % D] = 1;
+								heap.emplace((dis + a));
+							}
 						}
 					}
 					break;
