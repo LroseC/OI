@@ -71,9 +71,10 @@ inline int BFS(void)
 					break;
 				case '|':
 					if (t.dir < 2) {
+						dd = t.dir;
 						xx = t.x + gox[t.dir];
 						yy = t.y + goy[t.dir];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + a) % D].emplace(Node(xx, yy, t.dir));
 						if (!vis[(u + a) % D]) {
 							vis[(u + a) % D] = 1;
@@ -84,7 +85,7 @@ inline int BFS(void)
 						for (dd = 0; dd < 2; ++dd) {
 							xx = t.x + gox[dd];
 							yy = t.y + goy[dd];
-							if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+							if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 							q[(u + a) % D].emplace(Node(xx, yy, dd));
 							if (!vis[(u + a) % D]) {
 								vis[(u + a) % D] = 1;
@@ -97,7 +98,8 @@ inline int BFS(void)
 					if (t.dir >= 2) {
 						xx = t.x + gox[t.dir];
 						yy = t.y + goy[t.dir];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						dd = t.dir;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + a) % D].emplace(Node(xx, yy, t.dir));
 						if (!vis[(u + a) % D]) {
 							vis[(u + a) % D] = 1;
@@ -108,7 +110,7 @@ inline int BFS(void)
 						for (dd = 2; dd < 3; ++dd) {
 							xx = t.x + gox[dd];
 							yy = t.y + goy[dd];
-							if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+							if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 							q[(u + a) % D].emplace(Node(xx, yy, dd));
 							if (!vis[(u + a) % D]) {
 								vis[(u + a) % D] = 1;
@@ -124,7 +126,7 @@ inline int BFS(void)
 					if (t.dir == 3) dd = 0;
 					xx = t.x + gox[dd];
 					yy = t.y + goy[dd];
-					if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+					if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 					q[(u + b) % D].emplace(Node(xx, yy, dd));
 					if (!vis[(u + b) % D]) {
 						vis[(u + b) % D] = 1;
@@ -138,7 +140,7 @@ inline int BFS(void)
 					if (t.dir == 3) dd = 1;
 					xx = t.x + gox[dd];
 					yy = t.y + goy[dd];
-					if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+					if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 					q[(u + b) % D].emplace(Node(xx, yy, dd));
 					if (!vis[(u + b) % D]) {
 						vis[(u + b) % D] = 1;
@@ -149,7 +151,7 @@ inline int BFS(void)
 					for (dd = 0; dd < 4; ++dd) {
 						xx = t.x + gox[dd];
 						yy = t.y + goy[dd];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) continue;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) continue;
 						q[(u + c) % D].emplace(Node(xx, yy, dd));
 						if (!vis[(u + c) % D]) {
 							vis[(u + c) % D] = 1;
@@ -162,7 +164,7 @@ inline int BFS(void)
 						dd = 3;
 						xx = t.x + gox[dd];
 						yy = t.y + goy[dd];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + d) % D].emplace(Node(xx, yy, dd));
 						if (!vis[(u + d) % D]) {
 							vis[(u + d) % D] = 1;
@@ -173,7 +175,7 @@ inline int BFS(void)
 						dd = 3;
 						xx = t.x;
 						yy = t.y - 2;
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[u].emplace(Node(xx, yy, dd));
 					}
 					break;
@@ -182,7 +184,7 @@ inline int BFS(void)
 						dd = 2;
 						xx = t.x + gox[dd];
 						yy = t.y + goy[dd];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + d) % D].emplace(Node(xx, yy, dd));
 						if (!vis[(u + d) % D]) {
 							vis[(u + d) % D] = 1;
@@ -193,7 +195,7 @@ inline int BFS(void)
 						dd = 2;
 						xx = t.x;
 						yy = t.y + 2;
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[u].emplace(Node(xx, yy, dd));
 					}
 					break;
@@ -202,7 +204,7 @@ inline int BFS(void)
 						dd = 1;
 						xx = t.x + gox[dd];
 						yy = t.y + goy[dd];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + d) % D].emplace(Node(xx, yy, dd));
 						if (!vis[(u + d) % D]) {
 							vis[(u + d) % D] = 1;
@@ -213,7 +215,7 @@ inline int BFS(void)
 						dd = 1;
 						xx = t.x - 2;
 						yy = t.y;
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[u].emplace(Node(xx, yy, dd));
 					}
 					break;
@@ -222,7 +224,7 @@ inline int BFS(void)
 						dd = 0;
 						xx = t.x + gox[dd];
 						yy = t.y + goy[dd];
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[(u + d) % D].emplace(Node(xx, yy, dd));
 						if (!vis[(u + d) % D]) {
 							vis[(u + d) % D] = 1;
@@ -233,7 +235,7 @@ inline int BFS(void)
 						dd = 0;
 						xx = t.x + 2;
 						yy = t.y;
-						if (xx <= 0 || xx > n || yy <= 0 || yy > m) break;
+						if (xx <= 0 || xx > n || yy <= 0 || yy > m || G[xx][yy] == '#' || VIS[xx][yy][dd]) break;
 						q[u].emplace(Node(xx, yy, dd));
 					}
 					break;
