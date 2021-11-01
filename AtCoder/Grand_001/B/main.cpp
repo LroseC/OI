@@ -3,6 +3,7 @@
 
 using namespace std;
 using LL = long long;
+const char endl = '\n';
 
 struct FastStreamInput
 {
@@ -12,7 +13,8 @@ struct FastStreamInput
 		res = 0; T f = 1; char ch = getchar();
 		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
 		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
-		res *= f; return *this;
+		res *= f;
+		return *this;
 	}
 } cin;
 struct FastStreamOutput
@@ -39,7 +41,26 @@ struct FastStreamOutput
 	}
 } cout;
 
+LL n, x;
+
+LL calc(LL a, LL b)
+{
+	if (!a) return -b;
+	if (!b) return -a;
+	if (a > b) {
+		LL k = a / b;
+		return 2 * k * b + calc(b, a % b);
+	}
+	else {
+		LL k = b / a;
+		return 2 * k * a + calc(a, b % a);
+	}
+}
+
 int main(void)
 {
+	cin >> n >> x;
+	LL res = n;
+	cout << res + calc(n - x, x) << endl;
 	return 0;
 }
