@@ -3,6 +3,7 @@
 
 using namespace std;
 using LL = long long;
+const char endl = '\n';
 
 struct FastStreamInput
 {
