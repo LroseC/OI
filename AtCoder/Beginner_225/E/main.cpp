@@ -1,58 +1,56 @@
-#include <map>
 #include <vector>
+#include <cctype>
 #include <cstdio>
 #include <algorithm>
 
 using namespace std;
 
-const int N = 2e5 + 10;
-
-using PII = pair<int, int>;
-
-int n, idx;
-PII P[N];
-map<PII, int> M;
-int cnt[10];
-int color[N];
-vector<int> G[N];
-int gox[] = {1, -1, 0, 0};
-int goy[] = {0, 0, 1, -1};
-
-void dfs(int u, int c)
+struct FSI
 {
-	++cnt[c];
-	color[u] = c;
-	for (int v : G[u]) {
-		if (!color[v]) dfs(v, 3 - c);
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
 	}
-}
-inline int Paint(int x)
+} cin;
+
+int n;
+
+struct PII
 {
-	cnt[1] = cnt[2] = 0;
-	dfs(x, 1);
-	return max(cnt[1], cnt[2]);
-}
+	int x, y;
+	PII(int _x, int _y) : x(_x), y(_y) {}
+	bool operator<(const PII &other) const
+	{
+		return 1ll * y * other.x < 1ll * other.y * x;
+	}
+	bool operator<=(const PII &other) const
+	{
+		return 1ll * y * other.x <= 1ll * other.y * x;
+	}
+};
 
 int main(void)
 {
-	scanf("%d", &n);
+	cin >> n;
+	vector< pair<PII, PII> > a;
 	for (int i = 1; i <= n; ++i) {
-		int u, v; scanf("%d%d", &u, &v);
-		M[PII({u, v})] = ++idx;
-		P[idx] = PII({u, v});
+		int x, y; cin >> x >> y;
+		PII begin(x, y - 1), end(x - 1, y);
+		a.emplace_back(make_pair(end, begin));
 	}
-	
-	for (int i = 1; i <= n; ++i)
-		for (int k = 0; k < 4; ++k) {
-			int xx = P[i].first + gox[k];
-			int yy = P[i].second + goy[k];
-			if (M.count(PII({xx, yy})))
-				G[i].emplace_back(M[PII({xx, yy})]);
+	sort(a.begin(), a.end());
+	int ans = 1;
+	auto now = a[0].first;
+	for (int i = 1; i < a.size(); ++i) {
+		if (now <= a[i].second) {
+			auto t = a[i];
+			++ans;
+			now = a[i].first;
 		}
-
-	int ans = 0;
-	for (int i = 1; i <= n; ++i) {
-		if (!color[i]) ans += Paint(i);
 	}
 	printf("%d\n", ans);
 	return 0;
