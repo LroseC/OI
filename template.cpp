@@ -5,31 +5,29 @@ using namespace std;
 using LL = long long;
 const char endl = '\n';
 
-struct FastStreamInput
+struct FastStreamInputOutput
 {
+	using FSIO = FastStreamInputOutput;
 	template<typename T>
-	FastStreamInput& operator>>(T &res)
+	FSIO& operator>>(T &res)
 	{
 		res = 0; T f = 1; char ch = getchar();
 		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
 		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
 		res *= f; return *this;
 	}
-} cin;
-struct FastStreamOutput
-{
-	FastStreamOutput& operator<<(char x)
+	FSIO& operator<<(char x)
 	{
 		putchar(x);
 		return *this;
 	}
-	FastStreamOutput& operator<<(const char x[])
+	FSIO& operator<<(const char x[])
 	{
 		for (int i = 0; x[i]; ++i) putchar(x[i]);
 		return *this;
 	}
 	template<typename T>
-	FastStreamOutput& operator<<(const T &res)
+	FSIO& operator<<(const T &res)
 	{
 		static char buf[50]; int p = -1; T x = res;
 		if (x == 0) putchar('0');
@@ -38,7 +36,7 @@ struct FastStreamOutput
 		while (~p) { putchar(buf[p] + '0'); --p; }
 		return *this;
 	}
-} cout;
+} io;
 
 int main(void)
 {
