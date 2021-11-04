@@ -40,5 +40,6 @@ struct FastStreamInputOutput
 
 int main(void)
 {
+	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
 	return 0;
 }
