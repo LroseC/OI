@@ -1,6 +1,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
 
 using namespace std;
 using LL = long long;
@@ -40,11 +41,12 @@ struct FastStreamInputOutput
 } io;
 
 const int N = 5010;
+const int mod = 1e9 + 7;
 
 int n, len;
 char str[N];
 /*
-f[i][j] means that all the state which do i operation and there
+f[i][j] means that all the state which do i operation and there is j difference
 */
 int f[N][N];
 
@@ -52,9 +54,12 @@ int main(void)
 {
 	io >> n;
 	scanf("%s", str + 1);
-	m = strlen(str + 1);
+	len = strlen(str + 1);
+	f[0][0] = 1;
 	for (int i = 1; i <= n; ++i)
-		for (int j = 1; j <= n; ++j) {
+		for (int j = 0; j <= i; ++j) {
+			f[i][j] = (f[i - 1][max(0, j - 1)] + f[i - 1][j + 1] * 2ll % mod) % mod;
 		}
+	printf("%d\n", f[n][len]);
 	return 0;
 }
