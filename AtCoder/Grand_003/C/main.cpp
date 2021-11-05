@@ -1,5 +1,7 @@
+#include <vector>
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 using namespace std;
 using LL = long long;
@@ -36,10 +38,27 @@ struct FastStreamInputOutput
 		while (~p) { putchar(buf[p] + '0'); --p; }
 		return *this;
 	}
-} io;
+} cin;
+
+int n;
+vector<int> nums;
+int a[100010], b[100010];
 
 int main(void)
 {
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
+	cin >> n;
+	for (int i = 0; i < n; ++i) {
+		cin >> a[i];
+		nums.emplace_back(a[i]);
+	}
+	sort(nums.begin(), nums.end());
+	for (int i = 0; i < n; ++i)
+		a[i] = lower_bound(nums.begin(), nums.end(), a[i]) - nums.begin();
+	int cnt = 0;
+	for (int i = 0; i < n; ++i) {
+		if (i % 2 != a[i] % 2) ++cnt;
+	}
+	printf("%d\n", cnt / 2);
 	return 0;
 }
