@@ -90,7 +90,7 @@ int main(void)
 	}
 	f[na.size() - 1] = 1;
 	for (int i = na.size() - 1; i >= 1; --i) {
-		f[i - 1] = na[i] / na[i - 1] * f[i];
+		f[i - 1] += na[i] / na[i - 1] * f[i];
 		Solve(na[i] % na[i - 1], f[i]);
 	}
 	c[0] += f[0]; c[n + 1] -= f[0];
