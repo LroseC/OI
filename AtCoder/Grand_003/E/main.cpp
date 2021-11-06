@@ -44,36 +44,57 @@ struct FastStreamInputOutput
 const int N = 1e5 + 10, M = 17;
 
 int n, q;
-LL a[N], top = 1;
-LL c[N];
+LL a[N];
 LL f[N];
+LL c[N];
+LL minx[N];
+vector<LL> len;
+vector<LL> na;
 
 void Solve(LL x, LL times)
 {
-	int t = upper_bound(a + 1, a + 1 + top, x) - a - 1;
-	if (t == 0) c[0] += times, c[x + 1] -= times;
+	if (x <= na[0]) {
+		c[0] += times;
+		c[x + 1] -= times;
+	}
 	else {
-		f[t] += x / a[t] * times;
-		Solve(x % a[t], times);
+		int t = upper_bound(na.begin(), na.end(), x) - na.begin() - 1;
+		f[t] += x / na[t] * times;
+		Solve(x % na[t], times);
 	}
 }
 
 int main(void)
 {
+	int on;
 	io >> n >> q;
-	a[1] = n;
-	while (q--) {
-		LL x; io >> x;
-		while (top && x <= a[top]) --top;
-		a[++top] = x;
+	on = n;
+	int start = 1;
+	for (int i = 1; i <= q; ++i) {
+		io >> a[i];
+		if (a[i] < n) {
+			n = a[i];
+			start = i + 1;
+		}
 	}
-	f[top] = 1;
-	for (int i = top; i >= 2; --i) {
-		f[i - 1] = a[i] / a[i - 1] * f[i];
-		Solve(a[i] % a[i - 1], f[i]);
+	minx[q] = q;
+	for (int i = q - 1; i >= 1; --i) {
+		if (a[i] < a[minx[i + 1]])
+			minx[i] = i;
+		else minx[i] = minx[i + 1];
 	}
-	c[0] += f[1]; c[a[1] + 1] -= f[1];
-	for (int i = 1; i <= n; ++i) {
+	na.emplace_back(n);
+	for (int i = start, j; i <= q; i = j + 1) {
+		j = minx[i];
+		na.emplace_back(a[j]);
+	}
+	f[na.size() - 1] = 1;
+	for (int i = na.size() - 1; i >= 1; --i) {
+		f[i - 1] = na[i] / na[i - 1] * f[i];
+		Solve(na[i] % na[i - 1], f[i]);
+	}
+	c[0] += f[0]; c[n + 1] -= f[0];
+	for (int i = 1; i <= on; ++i) {
 		c[i] += c[i - 1];
 		io << c[i] << endl;
 	}
