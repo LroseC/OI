@@ -60,7 +60,7 @@ inline int qpow(int base, int kk)
 	return res;
 }
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
-int lcm(int a, int b) { return 1ll * a / gcd(a,b) * b % mod; }
+int lcm(int a, int b) { return 1ll * a * b / gcd(a, b); }
 inline int C(int n, int m)
 {
 	if (n > m) return 0;
@@ -79,7 +79,7 @@ void dfs(int now, int mintot, int dep)
 			tmp -= stk[i];
 		}
 		tmp = 1;
-		for (int i = 1; i < dep; ++i) {
+		for (int i = 2; i < dep; ++i) {
 			if (stk[i] == stk[i - 1]) ++tmp;
 			else {
 				res = 1ll * res * inv[tmp] % mod;
@@ -87,6 +87,7 @@ void dfs(int now, int mintot, int dep)
 			}
 		}
 		res = 1ll * res * inv[tmp] % mod;
+
 		int M = stk[1];
 		for (int i = 2; i < dep; ++i) M = lcm(M, stk[i]);
 		M = qpow(M, k);
@@ -107,8 +108,6 @@ signed main(void)
 	for (int i = 0; i <= 60; ++i) tinv[i] = qpow(i, mod - 2);
 	io >> n >> k;
 	dfs(1, n, 1);
-	printf("%d\n", ccnt);
 	io << ans << endl;
-	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
 	return 0;
 }
