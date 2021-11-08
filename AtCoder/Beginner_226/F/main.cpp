@@ -49,17 +49,18 @@ int stk[100];
 int fac[100], inv[100];
 int tinv[100];
 
-inline int qpow(int base, int k)
+inline int qpow(int base, int kk)
 {
 	int res = 1;
-	while (k) {
-		if (k & 1) res = 1ll * res * base % mod;
-		k >>= 1;
+	while (kk) {
+		if (kk & 1) res = 1ll * res * base % mod;
+		kk >>= 1;
 		base = 1ll * base * base % mod;
 	}
 	return res;
 }
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
+int lcm(int a, int b) { return 1ll * a / gcd(a,b) * b % mod; }
 inline int C(int n, int m)
 {
 	if (n > m) return 0;
@@ -70,20 +71,15 @@ void dfs(int now, int mintot, int dep)
 {
 	if (now > n) {
 		int res = 1;
-		for (int i = 1; i < dep; ++i) {
-			if (stk[i] > 2) res = 1ll * res * fac[stk[i] - 1];
-		}
+		for (int i = 1; i < dep; ++i)
+			res = 1ll * res * fac[stk[i] - 1] % mod;
 		int tmp = n;
 		for (int i = 1; i < dep; ++i) {
 			res = 1ll * res * C(stk[i], tmp) % mod;
 			tmp -= stk[i];
 		}
-
-		// for (int i = 1; i < dep; ++i) {
-		// 	res = 1ll * res * inv[stk[i]] % mod;
-		// }
 		tmp = 1;
-		for (int i = 2; i < dep; ++i) {
+		for (int i = 1; i < dep; ++i) {
 			if (stk[i] == stk[i - 1]) ++tmp;
 			else {
 				res = 1ll * res * inv[tmp] % mod;
@@ -91,12 +87,8 @@ void dfs(int now, int mintot, int dep)
 			}
 		}
 		res = 1ll * res * inv[tmp] % mod;
-
-		int d = stk[1];
-		for (int i = 2; i < dep; ++i) d = gcd(d, stk[i]);
 		int M = stk[1];
-		for (int i = 2; i < dep; ++i)
-			M = 1ll * stk[i] / d * M % mod;
+		for (int i = 2; i < dep; ++i) M = lcm(M, stk[i]);
 		M = qpow(M, k);
 		ans = (ans + 1ll * M * res % mod) % mod;
 		return;
@@ -107,7 +99,7 @@ void dfs(int now, int mintot, int dep)
 	}
 }
 
-int main(void)
+signed main(void)
 {
 	fac[0] = 1;
 	for (int i = 1; i <= 60; ++i) fac[i] = 1ll * fac[i - 1] * i % mod;
@@ -115,6 +107,7 @@ int main(void)
 	for (int i = 0; i <= 60; ++i) tinv[i] = qpow(i, mod - 2);
 	io >> n >> k;
 	dfs(1, n, 1);
+	printf("%d\n", ccnt);
 	io << ans << endl;
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
 	return 0;
