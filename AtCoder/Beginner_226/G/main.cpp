@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 using namespace std;
 using LL = long long;
@@ -38,8 +39,46 @@ struct FastStreamInputOutput
 	}
 } io;
 
+int T;
+LL a[10], b[10];
+
+void carry(int y, int x)
+{
+	LL c = min(a[x], b[y]);
+	a[x] -= c;
+	b[y] -= c;
+	b[y - x] += c;
+}
+
 int main(void)
 {
+	io >> T;
+	while (T--) {
+		for (int i = 1; i <= 5; ++i) io >> a[i];
+		for (int i = 1; i <= 5; ++i) io >> b[i];
+		carry(5, 5);
+		carry(4, 4);
+		carry(5, 4);
+		carry(3, 3);
+		carry(5, 3);
+		carry(4, 3);
+		carry(5, 2);
+		carry(4, 2);
+		carry(3, 2);
+		carry(2, 2);
+		carry(5, 1);
+		carry(4, 1);
+		carry(3, 1);
+		carry(2, 1);
+		carry(1, 1);
+		bool fail = 0;
+		for (int i = 1; i <= 5; ++i)
+			if (a[i] > 0) {
+				puts("No");
+				fail = 1; break;
+			}
+		if (!fail) puts("Yes");
+	}
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
 	return 0;
 }
