@@ -1,3 +1,4 @@
+#include <vector>
 #include <cctype>
 #include <cstdio>
 
@@ -38,8 +39,40 @@ struct FastStreamInputOutput
 	}
 } io;
 
+const int N = 1e5 + 10;
+
+int n, K;
+int res;
+int to[N];
+bool vis[N];
+int dis[N];
+vector<int> G[N];
+
+int dfs(int u, int fa)
+{
+	int dep = 0;
+	for (int v : G[u]) {
+		if (v == fa) continue;
+		dep = max(dep, dfs(v, u));
+	}
+	if (dep == K - 1 && u != 1 && to[u] != 1) {
+		++res;
+		dep = -1;
+	}
+	return dep + 1;
+}
+
 int main(void)
 {
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
+	io >> n >> K;
+	for (int i = 1; i <= n; ++i) {
+		io >> to[i];
+		if (i != 1)
+			G[to[i]].emplace_back(i);
+	}
+	res = to[1] != 1;
+	dfs(1, 1);
+	io << res << endl;
 	return 0;
 }
