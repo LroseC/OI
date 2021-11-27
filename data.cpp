@@ -14,6 +14,8 @@ char c[]={"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
 
 int a[15],b[15],ol[15],la[15];
 int n,m,k,T=10;
+int n[] = {};
+int m[] = {};
 inline void create(reg int id,reg FILE* in){
 
 	for (int t=1;t<=10;t++)
