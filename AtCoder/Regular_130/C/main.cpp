@@ -66,23 +66,21 @@ bool check(int x)
 
 int main(void)
 {
-	int cnt9 = 0;
-	bool swp = 0;
 	scanf("%s%s", str1 + 1, str2 + 1);
 	n = strlen(str1 + 1);
 	m = strlen(str2 + 1);
+    bool swp = 0;
 	if (n > m) {
-		swp = 1;
+        swp = 1;
 		swap(n, m);
 		swap(str1, str2);
 	}
 	for (int i = 1; i <= n; ++i) ++cnt1[str1[i] - '0'];
 	for (int i = 1; i <= m; ++i) ++cnt2[str2[i] - '0'];
-	int cha = m - n;
-	cnt9 = min(cnt2[9], cha);
-	cnt2[9] -= cnt9;
 	int tmp = 0;
 	bool flag = 0;
+	int cnt9 = min(cnt2[9], m - n);
+	cnt2[9] -= cnt9;
 	for (int i = 1; i <= n; ++i) {
 		int k = 10 - tmp;
 		tmp = 0;
@@ -125,21 +123,7 @@ int main(void)
 		}
 	}
 	ios::sync_with_stdio(0);
-	// reverse(ans1.begin(), ans1.end());
-	// reverse(ans2.begin(), ans2.end());
-	// int tot = 0;
-	// char ttmp[100010];
-	// for (int i = 0; i < n; ++i) ttmp[i] = ans1[i] - '0' + ans2[i] - '0';
-	// for (int i = n; i < m; ++i) ttmp[i] = ans2[i] - '0';
-	// for (int i = 0; i < m; ++i) {
-	// 	ttmp[i + 1] += ttmp[i] / 10;
-	// 	ttmp[i] %= 10;
-	// 	tot += ttmp[i];
-	// }
-	// printf("tot = %d\n", tot + ttmp[m]);
-	// reverse(ans1.begin(), ans1.end());
-	// reverse(ans2.begin(), ans2.end());
-	if (swp = 1) swap(ans1, ans2);
+  	if (swp) swap(ans1, ans2);
 	cout << ans1 << '\n' << ans2 << '\n';
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
 	return 0;
