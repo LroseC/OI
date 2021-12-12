@@ -15,12 +15,14 @@ struct FSI
 	}
 } io;
 
-const int N = 5010;
+const int N = 3e5 + 10;
 
 int TYPE;
 int n, m;
 int lastans;
 vector<int> G[N];
+bool vis[N];
+int stk[N], top;
 
 void dfs(int u, int fa, int dep, int &res)
 {
@@ -46,9 +48,9 @@ int main(void)
 			G[y].emplace_back(x);
 		}
 		else {
-			int ans = 0;
-			dfs(x, x, 0, ans);
-			printf("%d\n", ans);
+			lastans = 0;
+			dfs(x, x, 0, lastans);
+			printf("%d\n", lastans);
 		}
 	}
 	return 0;
