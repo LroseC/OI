@@ -1,6 +1,7 @@
 #include <vector>
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 using namespace std;
 
@@ -17,28 +18,33 @@ struct FSI
 } io;
 
 using LL = long long;
-const int N = 1e5 + 10;
+const int N = 1e6 + 10;
 
 struct Query
 {
 	int x, l, r, v;
 	Query(void) { x = l = r = v = 0; }
 	Query(int _x, int _l, int _r, int _v) : x(_x), l(_l), r(_r), v(_v) {}
+	bool operator<(const Query& other) const
+	{
+		return x < other.x;
+	}
 };
 struct node
 {
 	int l, r;
 	int res;
 	int cnt;
-}
+};
 
-int n;
+int n, idx;
 node tr[N << 2];
 Query q[N << 1];
 vector<int> nums;
 
 void maintain(int u)
 {
+	int l = tr[u].l, r = tr[u].r;
 	if (tr[u].cnt)
 		tr[u].res = nums[r + 1] - nums[l];
 	else
@@ -46,15 +52,32 @@ void maintain(int u)
 }
 void build(int u, int l, int r)
 {
+	tr[u].l = l; tr[u].r = r;
 	if (l == r) {
-		tr[u].l = l; tr[u].r = r;
 		tr[u].res = tr[u].cnt = 0;
-		return 0;
+		return ;
 	}
 	int mid = l + r >> 1;
 	build(u << 1, l, mid);
 	build(u << 1 | 1, mid + 1, r);
 	maintain(u);
+}
+void add(int L, int R, int val, int u = 1)
+{
+	int l = tr[u].l, r = tr[u].r;
+	if (L <= l && r <= R) {
+		tr[u].cnt += val;
+		maintain(u);
+		return ;
+	}
+	int mid = l + r >> 1;
+	if (L <= mid) add(L, R, val, u << 1);
+	if (R > mid) add(L, R, val, u << 1 | 1);
+	maintain(u);
+}
+int query(void)
+{
+	return tr[1].res;
 }
 
 int main(void)
