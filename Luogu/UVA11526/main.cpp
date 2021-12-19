@@ -20,7 +20,7 @@ using LL = long long;
 LL f(int x)
 {
 	LL res = 0;
-	for (int i = 1, j; i <= x; i = j + 1) {
+	for (LL i = 1, j; i <= x; i = j + 1) {
 		j = x / (x / i);
 		res += 1ll * (j - i + 1) * (x / i);
 	}
