@@ -36,7 +36,7 @@ struct FastStreamInputOutput
 		while (~p) { putchar(buf[p] + '0'); --p; }
 		return *this;
 	}
-} io;
+} IO;
 
 int main(void)
 {
