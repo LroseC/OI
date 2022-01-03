@@ -18,6 +18,14 @@ struct PII
 		return y < other.y;
 	}
 };
+struct cmp
+{
+	bool operator()(const PII &a, const PII &b)
+	{
+		if (a.x != b.x) return a.x > b.x;
+		return a.y > b.y;
+	}
+};
 struct Edge
 {
 	int u, v, length, height;
@@ -33,6 +41,7 @@ const int N = 2e5 + 10, M = 4e5 + 10, LOG = 20;
 
 int T;
 int n, m, nodecnt;
+bool vis[N + M];
 int dep[N + M], dis[N + M], fa[N + M][LOG];
 int oriid[N + M];
 Edge edge[M];
@@ -56,14 +65,17 @@ namespace UnionFind
 
 void Dijkstra(void)
 {
-	priority_queue<PII> heap;
+	priority_queue<PII, vector<PII>, cmp> heap;
+	memset(vis, 0, sizeof vis);
 	memset(dis, 0x3f, sizeof dis);
 	dis[1] = 0; heap.emplace(0, 1);
 	while (heap.size()) {
 		auto t = heap.top(); heap.pop();
 		int u = t.y;
+		vis[u] = 1;
 		for (auto e : G[u]) {
 			int v = e.x, w = e.y;
+			if (vis[v]) continue;
 			if (dis[v] > dis[u] + w) {
 				dis[v] = dis[u] + w;
 				heap.emplace(dis[v], v);
