@@ -29,7 +29,7 @@ struct Edge
 	}
 };
 
-const int N = 2e6 + 10, M = 4e6 + 10, LOG = 22;
+const int N = 2e5 + 10, M = 4e5 + 10, LOG = 20;
 
 int T;
 int n, m, nodecnt;
