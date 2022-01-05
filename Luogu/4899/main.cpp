@@ -136,10 +136,6 @@ struct Kruskal
 					u = fa[u][k];
 				}
 		}
-		puts("begin");
-		printf("type = %d, lim = %d\n", type, lim);
-		print(u);
-		puts("end");
 		return make_pair(L[u], R[u]);
 	}
 } TK_Human, TK_Monster;
@@ -152,21 +148,13 @@ void build_SGT(void)
 		TREE[i] = pos[TK_Monster.nums[i]];
 		root[i] = SGT::add(root[i - 1], TREE[i]);
 	}
-	puts("");
-	for (int i = 1; i <= n; ++i) printf("%d ", TK_Human.nums[i]);
-	puts("");
-	for (int i = 1; i <= n; ++i) printf("%d ", TK_Monster.nums[i]);
-	puts("");
-	puts("end");
 }
 
 bool query(int Human, int Monster, int LimHuman, int LimMoster)
 {
 	auto SeqHuman = TK_Human.query(Human, LimHuman);
 	auto SeqMonster = TK_Monster.query(Monster, LimMoster);
-	printf("SeqHuman = (%d, %d)\n", SeqHuman.first, SeqHuman.second);
-	printf("SeqMonster = (%d, %d)\n", SeqMonster.first, SeqMonster.second);
-	return (bool)SGT::query(root[SeqHuman.first - 1], root[SeqHuman.second], SeqMonster.first, SeqMonster.second);
+	return (bool)SGT::query(root[SeqMonster.first - 1], root[SeqMonster.second], SeqHuman.first, SeqHuman.second);
 }
 
 int main(void)
