@@ -130,7 +130,6 @@ void build(int &u, int l, int r)
 	build(tr[u].r, mid + 1, r);
 	maintain(u);
 }
-void print(int u);
 void query(int l, int r, int &ans)
 {
 	auto x = split(root, l - 1);
@@ -195,13 +194,6 @@ void dfs(int u)
 	if (tr[u].l) dfs(tr[u].l);
 	tmp[++cnt] = tr[u].val;
 	if (tr[u].r) dfs(tr[u].r);
-}
-void print(int u)
-{
-	spread(u);
-	if (tr[u].l) print(tr[u].l);
-	printf("%d ", tr[u].val);
-	if (tr[u].r) print(tr[u].r);
 }
 
 int main(void)
