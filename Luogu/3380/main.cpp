@@ -141,8 +141,14 @@ int queryNum(int L, int R, int k)
 	int l = 0, r = 1e8;
 	while (l < r) {
 		int mid = l + r >> 1;
-		if (queryRank(L, R, mid) < k - 1) l = mid + 1;
+		if (queryRank(L, R, mid + 1) < k) l = mid + 1;
 		r = mid;
+	}
+	r = 1e8;
+	while (l < r) {
+		int mid = l + r >> 1;
+		if (queryRank(L, R, mid) + 1 == k) l = mid;
+		else r = mid - 1;
 	}
 	return l;
 }
