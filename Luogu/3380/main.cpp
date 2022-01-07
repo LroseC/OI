@@ -1,41 +1,48 @@
+#include <cctype>
 #include <cstdio>
 #include <climits>
-#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-const int N = 5e4 + 10;
+const int N = 1e5 + 10;
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
+	}
+} cin;
 
 int n, m;
 int a[N];
+int _tick;
 
 namespace FHQ
 {
 	int idx;
 	struct node
 	{
-		int l, r, key, w, cnt, sz;
-	} tr[N << 6];
+		int l, r, key, w, sz;
+	} tr[N * 30];
 
-	void print(int u)
-	{
-		if (tr[u].l) print(tr[u].l);
-		for (int i = 1; i <= tr[u].cnt; ++i)
-			printf("%d ", tr[u].key);
-		if (tr[u].r) print(tr[u].r);
-	}
 	int New(int val)
 	{
 		int u = ++idx;
+		tr[u].sz = 1;
+		tr[u].key = val;
 		tr[u].w = rand();
 		tr[u].l = tr[u].r = 0;
-		tr[u].key = val;
-		tr[u].cnt = tr[u].sz = 1;
 		return u;
 	}
 	void maintain(int u)
 	{
-		tr[u].sz = tr[tr[u].l].sz + tr[tr[u].r].sz + tr[u].cnt;
+		tr[u].sz = tr[tr[u].l].sz + tr[tr[u].r].sz + 1;
 	}
 	pair<int, int> split(int u, int key)
 	{
@@ -69,53 +76,64 @@ namespace FHQ
 	}
 	void insert(int &root, int val)
 	{
-		auto x = split(root, val - 1);
-		auto y = split(x.second, val);
-		if (y.first) ++tr[y.first].cnt;
-		else y.first = New(val);
-		root = merge(x.first, merge(y.first, y.second));
+		auto x = split(root, val);
+		root = merge(x.first, merge(New(val), x.second));
 	}
 	void remove(int &root, int val)
 	{
 		auto x = split(root, val - 1);
 		auto y = split(x.second, val);
-		--tr[y.first].cnt;
-		if (tr[y.first].cnt)
-			root = merge(x.first, merge(y.first, y.second));
-		else
-			root = merge(x.first, y.second);
+		y.first = merge(tr[y.first].l, tr[y.first].r);
+		root = merge(x.first, merge(y.first, y.second));
 	}
 	int query(int &root, int val)
 	{
-		auto t = split(root, val - 1);
-		int res = tr[t.first].sz;
-		root = merge(t.first, t.second);
+		int u = root;
+		int res = 0;
+		while (u) {
+			if (tr[u].key < val) {
+				res += tr[tr[u].l].sz + 1;
+				u = tr[u].r;
+			}
+			else
+				u = tr[u].l;
+		}
 		return res;
 	}
 	int GetPre(int &root, int val)
 	{
-		auto t = split(root, val - 1);
-		int u = t.first;
-		while (tr[u].r) u = tr[u].r;
-		root = merge(t.first, t.second);
-		return tr[u].key;
+		int u = root;
+		int res = -INT_MAX;
+		while (u) {
+			if (tr[u].key >= val)
+				u = tr[u].l;
+			else {
+				res = max(res, tr[u].key);
+				u = tr[u].r;
+			}
+		}
+		return res;
 	}
 	int GetNex(int &root, int val)
 	{
-		auto t = split(root, val);
-		int u = t.second;
-		while (tr[u].l) u = tr[u].l;
-		root = merge(t.first, t.second);
-		return tr[u].key;
+		int u = root;
+		int res = INT_MAX;
+		while (u) {
+			if (tr[u].key <= val)
+				u = tr[u].r;
+			else {
+				res = min(res, tr[u].key);
+				u = tr[u].l;
+			}
+		}
+		return res;
 	}
 };
 
-int tr[N << 2];
+int tr[N << 3];
 
 void build(int u = 1, int l = 1, int r = n)
 {
-	FHQ::insert(tr[u], INT_MAX);
-	FHQ::insert(tr[u], -INT_MAX);
 	for (int i = l; i <= r; ++i)
 		FHQ::insert(tr[u], a[i]);
 
@@ -127,7 +145,7 @@ void build(int u = 1, int l = 1, int r = n)
 }
 int queryRank(int L, int R, int val, int u = 1, int l = 1, int r = n)
 {
-	if (L <= l && r <= R) return FHQ::query(tr[u], val) - 1;
+	if (L <= l && r <= R) return FHQ::query(tr[u], val);
 	int mid = l + r >> 1;
 	int res = 0;
 	if (L <= mid)
@@ -142,13 +160,7 @@ int queryNum(int L, int R, int k)
 	while (l < r) {
 		int mid = l + r >> 1;
 		if (queryRank(L, R, mid + 1) < k) l = mid + 1;
-		r = mid;
-	}
-	r = 1e8;
-	while (l < r) {
-		int mid = l + r >> 1;
-		if (queryRank(L, R, mid) + 1 == k) l = mid;
-		else r = mid - 1;
+		else r = mid;
 	}
 	return l;
 }
@@ -182,13 +194,13 @@ int queryNex(int L, int R, int val, int u = 1, int l = 1, int r = n)
 
 int main(void)
 {
-	ios::sync_with_stdio(0);
 	cin >> n >> m;
 	for (int i = 1; i <= n; ++i) cin >> a[i];
 	build();
-	for (int i = 1; i <= m; ++i) {
+	for (_tick = 1; _tick <= m; ++_tick) {
 		int op; cin >> op;
 		int l, r, pos, k, val;
+//		printf("tick = %d, op = %d\n", _tick, op);
 		switch (op) {
 			case 1:
 				cin >> l >> r >> val;
