@@ -28,21 +28,22 @@ namespace FHQ
 	int idx;
 	struct node
 	{
-		int l, r, key, w, sz;
+		int l, r, w;
+		int key, cnt, sz;
 	} tr[N * 30];
 
 	int New(int val)
 	{
 		int u = ++idx;
-		tr[u].sz = 1;
 		tr[u].key = val;
 		tr[u].w = rand();
 		tr[u].l = tr[u].r = 0;
+		tr[u].sz = tr[u].cnt = 1;
 		return u;
 	}
 	void maintain(int u)
 	{
-		tr[u].sz = tr[tr[u].l].sz + tr[tr[u].r].sz + 1;
+		tr[u].sz = tr[tr[u].l].sz + tr[tr[u].r].sz + tr[u].cnt;
 	}
 	pair<int, int> split(int u, int key)
 	{
@@ -76,14 +77,22 @@ namespace FHQ
 	}
 	void insert(int &root, int val)
 	{
-		auto x = split(root, val);
-		root = merge(x.first, merge(New(val), x.second));
+		auto x = split(root, val - 1);
+		auto y = split(x.second, val);
+		if (y.first) {
+			++tr[y.first].cnt;
+			maintain(y.first);
+		}
+		else y.first = New(val);
+		root = merge(x.first, merge(y.first, y.second));
 	}
 	void remove(int &root, int val)
 	{
 		auto x = split(root, val - 1);
 		auto y = split(x.second, val);
-		y.first = merge(tr[y.first].l, tr[y.first].r);
+		--tr[y.first].cnt;
+		maintain(y.first);
+		if (!tr[y.first].cnt) y.first = 0;
 		root = merge(x.first, merge(y.first, y.second));
 	}
 	int query(int &root, int val)
@@ -92,7 +101,7 @@ namespace FHQ
 		int res = 0;
 		while (u) {
 			if (tr[u].key < val) {
-				res += tr[tr[u].l].sz + 1;
+				res += tr[tr[u].l].sz + tr[u].cnt;
 				u = tr[u].r;
 			}
 			else
