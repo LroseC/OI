@@ -11,89 +11,92 @@ namespace FHQ
 {
 	struct node
 	{
-		int l, r, w;
-		int key, sz;
-	} tr[N << 6];
-	int idx;
+		int w, key, sz;
+		node *l, *r;
 
-	int New(int key)
+		node(int _key)
+		{
+			sz = 1;
+			key = _key;
+			w = rand();
+			l = r = nullptr;
+		}
+	};
+	int size(node *u)
 	{
-		int u = ++idx;
-		tr[u].sz = 1;
-		tr[u].key = key;
-		tr[u].w = rand();
-		tr[u].l = tr[u].r = 0;
-		return u;
+		return u == nullptr ? 0 : u->sz;
 	}
-	void maintain(int u)
+	void maintain(node *u)
 	{
-		tr[u].sz = tr[tr[u].l].sz + tr[tr[u].r].sz + 1;
+		u->sz = size(u->l) + size(u->r) + 1;
 	}
-	pair<int, int> split(int u, int key)
+	pair< node*, node* > split(node *u, int key)
 	{
-		if (!u) return make_pair(0, 0);
-		if (tr[u].key <= key) {
-			auto t = split(tr[u].r, key);
-			tr[u].r = t.first;
+		if (u == nullptr)
+			return make_pair(nullptr, nullptr);
+		if (u->key <= key) {
+			auto t = split(u->r, key);
+			u->r = t.first;
 			maintain(u);
 			return make_pair(u, t.second);
 		}
 		else {
-			auto t = split(tr[u].l, key);
-			tr[u].l = t.second;
+			auto t = split(u->l, key);
+			u->l = t.second;
 			maintain(u);
 			return make_pair(t.first, u);
 		}
 	}
-	int merge(int x, int y)
+	node* merge(node *x, node *y)
 	{
-		if (!x || !y) return x + y;
-		if (tr[x].w < tr[y].w) {
-			tr[x].r = merge(tr[x].r, y);
+		if (x == nullptr) return y;
+		if (y == nullptr) return x;
+		if (x->w < y->w) {
+			x->r = merge(x->r, y);
 			maintain(x);
 			return x;
 		}
 		else {
-			tr[y].l = merge(x, tr[y].l);
+			y->l = merge(x, y->l);
 			maintain(y);
 			return y;
 		}
 	}
-	void insert(int &root, int key)
+	void insert(node *&root, int key)
 	{
 		auto t = split(root, key - 1);
-		root = merge(t.first, merge(New(key), t.second));
+		root = merge(t.first, merge(new node(key), t.second));
 	}
-	void remove(int &root, int key)
+	void remove(node *&root, int key)
 	{
 		auto x = split(root, key - 1);
 		auto y = split(x.second, key);
-		y.first = merge(tr[y.first].l, tr[y.first].r);
+		y.first = merge(y.first->l, y.first->r);
 		root = merge(x.first, merge(y.first, y.second));
 	}
-	int queryBigger(int &root, int key)
+	int queryBigger(node *&root, int key)
 	{
 		int res = 0;
-		int u = root;
-		while (u) {
-			if (tr[u].key >= key) {
-				res += tr[tr[u].r].sz + 1;
-				u = tr[u].l;
+		node *u = root;
+		while (u != nullptr) {
+			if (u->key >= key) {
+				res += size(u->r) + 1;
+				u = u->l;
 			}
-			else u = tr[u].r;
+			else u = u->r;
 		}
 		return res;
 	}
-	int querySmaller(int &root, int key)
+	int querySmaller(node *&root, int key)
 	{
 		int res = 0;
-		int u = root;
-		while (u) {
-			if (tr[u].key <= key) {
-				res += tr[tr[u].l].sz + 1;
-				u = tr[u].r;
+		node *u = root;
+		while (u != nullptr) {
+			if (u->key <= key) {
+				res += size(u->l) + 1;
+				u = u->r;
 			}
-			else u = tr[u].l;
+			else u = u->l;
 		}
 		return res;
 	}
@@ -102,11 +105,11 @@ namespace FHQ
 int n, m;
 int a[N], pos[N];
 LL ans;
-int Pre[N], Nex[N];
+FHQ::node *Pre[N], *Nex[N];
 
 void addPre(int k, int val)
 {
-	for (int i = k; i < N; i += lowbit(i))
+	for (int i = k; i <= n; i += lowbit(i))
 		FHQ::insert(Pre[i], val);
 }
 void addNex(int k, int val)
@@ -116,7 +119,7 @@ void addNex(int k, int val)
 }
 void delPre(int k, int val)
 {
-	for (int i = k; i < N; i += lowbit(i))
+	for (int i = k; i <= n; i += lowbit(i))
 		FHQ::remove(Pre[i], val);
 }
 void delNex(int k, int val)
@@ -134,7 +137,7 @@ LL queryPre(int k, int val)
 LL queryNex(int k, int val)
 {
 	LL res = 0;
-	for (int i = k; i < N; i += lowbit(i))
+	for (int i = k; i <= n; i += lowbit(i))
 		res += FHQ::querySmaller(Nex[i], val);
 	return res;
 }
