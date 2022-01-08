@@ -1,12 +1,26 @@
+#include <cctype>
 #include <cstdio>
-#include <iostream>
+#include <random>
+#include <utility>
 
 using namespace std;
 
 using LL = long long;
 using PIL = pair<int, LL>;
-const int N = 5e4 + 10, mod = 1e9 + 7;
+const int N = 5e5 + 10, mod = 1e9 + 7;
 inline int lowbit(int x) { return x & -x; }
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
+	}
+} cin;
 
 PIL operator+(PIL a, PIL b)
 {
@@ -172,7 +186,6 @@ LL query(int i)
 
 int main(void)
 {
-	ios::sync_with_stdio(0);
 	cin >> n >> m;
 	LL ans = 0;
 	for (int i = 1; i <= n; ++i) {
