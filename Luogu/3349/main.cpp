@@ -46,6 +46,7 @@ void dp(int u, int fa, int limit)
 
 int main(void)
 {
+	ios::sync_with_stdio(0);
 	cin >> n >> m;
 	for (int i = 1; i <= m; ++i) {
 		int u, v;
