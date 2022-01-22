@@ -16,6 +16,9 @@ struct FSI
 	}
 } IO;
 
+using LL = long long;
+const int mod = 998244353;
+
 struct DIII
 {
 	int x, y, z;
@@ -56,16 +59,21 @@ struct Matrix
 		return res;
 	}
 } Base[70];
+void print(Matrix x)
+{
+	for (int i = 0; i < x.r; ++i, puts(""))
+		for (int j = 0; j < x.c; ++j)
+			printf("%d ", x[i][j]);
+}
 
 LL n;
 int T, m, Lim, cnt;
 int inv[10];
-int id[10][10][10], idx;
-PDDD anti-id[1010];
+int id[10][10][10];
 
 inline int Getinv(int base)
 {
-	int k = mod, res = 1;
+	int k = mod - 2, res = 1;
 	while (k) {
 		if (k & 1) res = 1ll * res * base % mod;
 		k >>= 1;
@@ -76,39 +84,40 @@ inline int Getinv(int base)
 
 int init(void)
 {
-	for (int i = 0; i <= 8; ++i)
+	for (int i = 0; i <= 9; ++i)
 		inv[i] = Getinv(i);
 
 	for (int i = 0; i <= Lim; ++i)
 		for (int j = 0; j <= (m >= 2 ? Lim - i : 0); ++j)
 			for (int k = 0; k <= (m == 3 ? Lim - i - j : 0); ++k)
-				if (i + j + k <= Lim) {
-					id[i][j][k] = idx++;
-					anti-id[idx] = DIII(i, j, k);
-				}
+				if (i + j + k <= Lim)
+					id[i][j][k] = cnt++;
 	cnt++;
+	Base[0] = Matrix(cnt, cnt);
 	for (int i = 0; i <= Lim; ++i)
 		for (int j = 0; j <= (m >= 2 ? Lim - i : 0); ++j)
 			for (int k = 0; k <= (m == 3 ? Lim - i - j : 0); ++k) {
+				int now = id[i][j][k];
 				int val = inv[i + j + k + 1], add = i + j + k < Lim;
 				if (m == 1) {// f[i][j][k] => f[i - 1][j][k];
-					if (i) Base[0][id[i][j][k]][id[i - 1][j][k]] = 1ll * i * val % mod;
+					if (i) Base[0][now][id[i - 1][j][k]] = 1ll * i * val % mod;
 				}
-				else if (m == 2) {
-					if (i) Base[0][id[i][j][k]][id[i - 1][j][k]] = 1ll * i * val % mod;
-					if (j) Base[0][id[i][j][k]][id[i + 1][j + add][k]] = 1ll * i * val % mod;
+				if (m == 2) {
+					if (i) Base[0][now][id[i - 1][j][k]] = 1ll * i * val % mod;
+					if (j) Base[0][now][id[i + 1][j - 1 + add][k]] = 1ll * j * val % mod;
 				}
-				else {
-					if (i) Base[0][id[i][j][k]][id[i - 1][j][k]] = 1ll * i * val % mod;
-					if (j) Base[0][id[i][j][k]][id[i + 1][j - 1][k + add]] = 1ll * i * val % mod;
-					if (k) Base[0][id[i][j][k]][id[i][j + 1][k - 1 + add]] = 1ll * i * val % mod;
+				if (m == 3) {
+					if (i) Base[0][now][id[i - 1][j][k]] = 1ll * i * val % mod;
+					if (j) Base[0][now][id[i + 1][j - 1][k + add]] = 1ll * j * val % mod;
+					if (k) Base[0][now][id[i][j + 1][k - 1 + add]] = 1ll * k * val % mod;
 				}
 				//attack the boss
-				Base[0][id[i][j][k]][cnt - 1] = Base[0][id[i][j][k]][id[i][j][k]] = val;
+				Base[0][now][cnt - 1] = Base[0][now][now] = val;
 			}
 	Base[0][cnt - 1][cnt - 1] = 1;
 	for (int i = 1; i <= 63; ++i)
 		Base[i] = Base[i - 1] * Base[i - 1];
+	print(Base[1]);
 	return 0;
 }
 
@@ -116,12 +125,9 @@ int calc(int x)
 {
 	Matrix res(1, cnt);
 	res[0][id[m == 1][m == 2][m == 3]] = 1;
-	int k = x, t = 0;
-	while (k) {
-		if (k & 1) res = res * Base[t];
-		++t;
-		k >>= 1;
-	}
+	for (int i = 0; i <= 63; ++i)
+		if (x >> i & 1)
+			res = res * Base[i];
 	return res[0][cnt - 1];
 }
 
