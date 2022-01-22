@@ -117,15 +117,14 @@ int init(void)
 	Base[0][cnt - 1][cnt - 1] = 1;
 	for (int i = 1; i <= 63; ++i)
 		Base[i] = Base[i - 1] * Base[i - 1];
-	print(Base[1]);
 	return 0;
 }
 
-int calc(int x)
+int calc(LL x)
 {
 	Matrix res(1, cnt);
 	res[0][id[m == 1][m == 2][m == 3]] = 1;
-	for (int i = 0; i <= 63; ++i)
+	for (int i = 0; i <= 60; ++i)
 		if (x >> i & 1)
 			res = res * Base[i];
 	return res[0][cnt - 1];
