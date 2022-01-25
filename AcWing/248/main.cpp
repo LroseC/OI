@@ -17,23 +17,56 @@ struct FSI
 	}
 } IO;
 
+using LL = long long;
+
 struct Operation
 {
 	int x, l, r, val;
 
-	void Operation(void) : x(0), l(0), r(0), val(0) {}
-	void Operation(int _x, int _l, int _r, int _v) : x(_x), l(_l), r(_r), val(_v) {}
+	Operation(void) : x(0), l(0), r(0), val(0) {}
+	Operation(int _x, int _l, int _r, int _v) : x(_x), l(_l), r(_r), val(_v) {}
 	bool operator<(const Operation &other) const
 	{
 		if (x != other.x)
 			return x < other.x;
-		return v < other.v;
+		return val > other.val;
 	}
 };
 
 int n, W, H;
 vector<int> nums;
 vector<Operation> op;
+
+const int N = 2e4 + 10;
+
+namespace SegmentTree
+{
+	struct node
+	{
+		LL tag, max;
+	} tr[N << 2];
+
+	void maintain(int u)
+	{
+		tr[u].max = max(tr[u << 1].max, tr[u << 1 | 1].max) + tr[u].tag;
+	}
+	void add(int u, int val)
+	{
+		tr[u].tag += val;
+		tr[u].max += val;
+	}
+	void Add(int L, int R, int val, int l = 0, int r = nums.size(), int u = 1)
+	{
+		if (L <= l && r <= R) {
+			add(u, val);
+			return;
+		}
+		int mid = l + r >> 1;
+		if (L <= mid) Add(L, R, val, l, mid, u << 1);
+		if (R > mid) Add(L, R, val, mid + 1, r, u << 1 | 1);
+		maintain(u);
+	}
+}
 
 int main(void)
 {
@@ -43,13 +76,25 @@ int main(void)
 		for (int i = 1; i <= n; ++i) {
 			int x, y, val;
 			IO >> x >> y >> val;
-			op.emplace_back(x + 1, y + 1, y + H - 1, val);
-			op.emplace_back(x + W - 1, y + 1, y + H - 1, val);
-			nums.emplace_back(y + 1);
+			op.emplace_back(x + 1, y, y + H - 1, val);
+			op.emplace_back(x + W, y, y + H - 1, -val);
+			nums.emplace_back(y);
 			nums.emplace_back(y + H - 1);
 		}
 		sort(nums.begin(), nums.end());
 		nums.erase(unique(nums.begin(), nums.end()), nums.end());
+		for (int i = 0; i < op.size(); ++i) {
+			op[i].l = lower_bound(nums.begin(), nums.end(), op[i].l) - nums.begin();
+			op[i].r = lower_bound(nums.begin(), nums.end(), op[i].r) - nums.begin();
+		}
+		LL ans = 0;
+		sort(op.begin(), op.end());
+		for (int i = 0; i < op.size(); ++i) {
+			int l = op[i].l, r = op[i].r, val = op[i].val;
+			SegmentTree::Add(l, r - 1, val);
+			ans = max(ans, SegmentTree::tr[1].max);
+		}
+		printf("%lld\n", ans);
 	}
 	return 0;
 }
