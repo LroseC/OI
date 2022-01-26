@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define int long long
+
 struct FSI
 {
 	template<typename T>
@@ -29,7 +31,7 @@ struct Operation
 	{
 		if (x != other.x)
 			return x < other.x;
-		return val > other.val;
+		return val < other.val;
 	}
 };
 
@@ -68,18 +70,18 @@ namespace SegmentTree
 	}
 }
 
-int main(void)
+signed main(void)
 {
-	while (~scanf("%d%d%d", &n, &W, &H)) {
+	while (~scanf("%lld%lld%lld", &n, &W, &H)) {
 		op.clear();
 		nums.clear();
 		for (int i = 1; i <= n; ++i) {
 			int x, y, val;
 			IO >> x >> y >> val;
-			op.emplace_back(x + 1, y, y + H - 1, val);
-			op.emplace_back(x + W, y, y + H - 1, -val);
+			op.emplace_back(x, y, y + H, val);
+			op.emplace_back(x + W, y, y + H, -val);
 			nums.emplace_back(y);
-			nums.emplace_back(y + H - 1);
+			nums.emplace_back(y + H);
 		}
 		sort(nums.begin(), nums.end());
 		nums.erase(unique(nums.begin(), nums.end()), nums.end());
