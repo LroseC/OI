@@ -35,13 +35,19 @@ int main(void)
 			if (str[i] == str[j])
 				++j;
 			nex[i] = j;
-			ans[j] = ans[nex[j - 1]] + 1;
+			if (j)
+				ans[j] = ans[nex[j - 1]] + 1;
 		}
+		int res = 1;
 		for (int i = 1, j = 0; i < n; ++i) {
 			while (j && str[i] != str[j])
 				j = nex[j - 1];
 			if (str[i] == str[j])
 				++j;
-			while (
+			while ((j << 1) > (i + 1)) j = nex[j - 1];
+			res = 1ll * res * (ans[j] + 1) % mod;
+		}
+		printf("%d\n", res);
+	}
 	return 0;
 }
