@@ -34,7 +34,7 @@ void get_sa(void)
 		swap(x, y);
 		num = 0;
 		for (int i = 1; i <= n; ++i)
-			x[sa[i]] = y[sa[i]] == y[sa[i - 1]] && y[sa[i] + k] == y[sa[i - 1] + k] ? num : ++num;
+			x[sa[i]] = y[sa[i]] == y[sa[i - 1]] && (sa[i] + k <= n ? y[sa[i] + k] : 0) == (sa[i - 1] + k <= n ? y[sa[i - 1] + k] : 0) ? num : ++num;
 		if (num == n) break;
 		m = num;
 	}
