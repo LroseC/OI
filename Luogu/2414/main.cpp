@@ -25,13 +25,43 @@ int stk[N], top;
 int pos[N], ans[N];
 
 int idx, ch[N][26], fail[N];
-bool end[N];
+bool failedge[N][26];
+bool ed[N];
 
+struct Query
+{
+	int v, id;
+	Query(int _v, int _id) : v(_v), id(_id) {}
+};
 int dfn[N], dfncnt;
-vector<int> Q[N];
+int L[N], R[N];
+vector<Query> Q[N];
 vector<int> Fail[N];
 
 int nowpos;
+
+namespace BIT
+{
+	int tr[N];
+
+	inline int lowbit(int x) { return x & -x; }
+	void add(int x, int val)
+	{
+		for (int i = x; i < N; i += lowbit(i))
+			tr[i] += val;
+	}
+	int query(int x)
+	{
+		int res = 0;
+		for (int i = x; i; i -= lowbit(i))
+			res += tr[i];
+		return res;
+	}
+	int query(int l, int r)
+	{
+		return query(r) - query(l - 1);
+	}
+}
 
 void back(void)
 {
@@ -39,14 +69,14 @@ void back(void)
 }
 void addend(int id)
 {
-	end[nowpos] = 1;
+	ed[nowpos] = 1;
 	pos[id] = nowpos;
 }
-void insert(int ch)
+void insert(int son)
 {
-	if (!ch[nowpos][ch])
-		ch[nowpos][ch] = ++idx;
-	nowpos = ch[nowpos][ch];
+	if (!ch[nowpos][son])
+		ch[nowpos][son] = ++idx;
+	nowpos = ch[nowpos][son];
 	stk[++top] = nowpos;
 }
 
@@ -55,8 +85,7 @@ void build(void)
 	queue<int> q;
 	for (int i = 0; i < 26; ++i)
 		if (ch[0][i]) {
-			q.emplace_back(ch[0][i]);
-			Fail[0].emplace_back(ch[0][i]);
+			q.emplace(ch[0][i]);
 		}
 	while (q.size()) {
 		int u = q.front(); q.pop();
@@ -64,18 +93,34 @@ void build(void)
 			if (ch[u][i]) {
 				q.emplace(ch[u][i]);
 				fail[ch[u][i]] = ch[fail[u]][i];
-				Fail[fail[ch[u][i]]].emplace_back(ch[u][i]);
 			}
-			else ch[u][i] = ch[fail[u]][i];
+			else {
+				failedge[u][i] = 1;
+				ch[u][i] = ch[fail[u]][i];
+			}
 		}
 	}
+	for (int i = 1; i <= idx; ++i)
+		Fail[fail[i]].emplace_back(i);
 }
 
 void dfs_fail(int u)
 {
 	dfn[u] = ++dfncnt;
-	for (int v : Fail[u]) {
-	}
+	L[u] = dfncnt;
+	for (int v : Fail[u])
+		dfs_fail(v);
+	R[u] = dfncnt;
+}
+void calc(int u)
+{
+	BIT::add(dfn[u], 1);
+	if (ed[u])
+		for (auto t : Q[u])
+			ans[t.id] = BIT::query(L[t.v], R[t.v]);
+	for (int i = 0; i < 26; ++i)
+		if (ch[u][i] && !failedge[u][i]) calc(ch[u][i]);
+	BIT::add(dfn[u], -1);
 }
 
 int main(void)
@@ -104,7 +149,7 @@ int main(void)
 		Q[pos[v]].emplace_back(pos[u], i);
 	}
 	dfs_fail(0); //把 fail 树转化为序列
-	calc(); //然后在 trie 树上 dfs 统一处理所有答案
+	calc(0); //然后在 trie 树上 dfs 统一处理所有答案
 	for (int i = 1; i <= m; ++i)
 		printf("%d\n", ans[i]);
 	return 0;
