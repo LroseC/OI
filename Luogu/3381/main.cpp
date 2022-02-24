@@ -65,10 +65,10 @@ namespace Dinic
 		}
 		vis[u] = 1;
 		int rest = flow;
-		for (int e = now[u]; rest && e; e = nex[e]) {
-			now[u] = e;
-			if (vis[to[e]]) continue;
+		for (int e = now[u]; rest && e; e = nex[e])
 			if (c[e] && dis[to[e]] == dis[u] + w[e]) {
+				now[u] = e;
+				if (vis[to[e]]) continue;
 				int tmp = dfs(to[e], min(c[e], rest));
 				if (!tmp) dis[to[e]] = INT_MAX;
 				else {
@@ -77,16 +77,14 @@ namespace Dinic
 					c[e ^ 1] += tmp;
 				}
 			}
-		}
 		vis[u] = 0;
 		return flow - rest;
 	}
 	int main(void)
 	{
 		ans = 0, res = 0;
-		while (SPFA()) {
+		while (SPFA())
 			res += dfs(S, INT_MAX);
-		}
 		return 0;
 	}
 }
