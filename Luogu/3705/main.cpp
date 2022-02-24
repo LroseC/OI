@@ -47,9 +47,9 @@ namespace Dinic
 	bool spfa(void)
 	{
 		queue<int> q;
-		dis[T] = -1e9;
+		dis[T] = -1e20;
 		for (int i = 1; i <= n << 1; ++i)
-			dis[i] = -1e9;
+			dis[i] = -1e20;
 		memcpy(now, head, sizeof head);
 		memset(vis, 0, sizeof vis);
 		q.emplace(S); dis[S] = 0;
@@ -66,7 +66,7 @@ namespace Dinic
 					}
 				}
 		}
-		return dis[T] != -1e9;
+		return dis[T] != -1e20;
 	}
 	int dfs(int u, int flow, double &cost)
 	{
@@ -81,7 +81,7 @@ namespace Dinic
 				if (vis[to[e]]) continue;
 				now[u] = e;
 				int tmp = dfs(to[e], min(rest, c[e]), cost);
-				if (!tmp) dis[to[e]] = -1e9;
+				if (!tmp) dis[to[e]] = -1e20;
 				else {
 					rest -= tmp;
 					c[e] -= tmp;
@@ -124,7 +124,7 @@ int main(void)
 	for (int i = 1; i <= n; ++i)
 		for (int j = 1; j <= n; ++j)
 			read >> b[i][j];
-	double l = 0, r = 1e6;
+	double l = 0, r = 1e9;
 	while (r - l >= 1e-8) {
 		double mid = (l + r) / 2;
 		if (check(mid)) l = mid;
