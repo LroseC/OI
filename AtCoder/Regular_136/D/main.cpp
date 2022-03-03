@@ -38,8 +38,38 @@ struct FastStreamInputOutput
 	}
 } IO;
 
+const int N = 1e6;
+using i64 = long long;
+
+int n;
+int A[N + 10];
+i64 cnt[N];
+
 int main(void)
 {
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
+	IO >> n;
+	for (int i = 1; i <= n; ++i) {
+		IO >> A[i];
+		++cnt[A[i]];
+	}
+	for (int t = 1; t < 1e6; t = t * 10)
+		for (int i = 0; i < 1e6; i += 10 * t)
+			for (int j = 0; j < t; ++j)
+				for (int k = 1; k < 10; ++k)
+					cnt[i + j + k * t] += cnt[i + j + (k - 1) * t];
+
+	i64 res = 0;
+	for (int i = 1; i <= n; ++i) {
+		int complement = 0;
+		bool flag = 1;
+		for (int t = 1; t < 1e6; t = t * 10) {
+			int now = 9 - A[i] / t % 10;
+			if (now < A[i] / t % 10) flag = 0;
+			complement += t * now;
+		}
+		res += cnt[complement] - flag;
+	}
+	printf("%lld\n", res / 2);
 	return 0;
 }
