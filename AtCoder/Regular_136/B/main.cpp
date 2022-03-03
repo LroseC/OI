@@ -1,5 +1,7 @@
+#include <set>
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 using namespace std;
 using LL = long long;
@@ -39,48 +41,36 @@ struct FastStreamInputOutput
 } IO;
 
 const int N = 5010;
+using i64 = long long;
 
-int n;
-int a[N], b[N];
-
-void Operate(int pos)
+int Getrev(vector<int> &A)
 {
-	int x = a[pos], y = a[pos + 1], z = a[pos + 2];
-	a[pos] = z, a[pos + 1] = x, a[pos + 2] = y;
+	int res = 0;
+	for (int i = 0; i < A.size(); ++i)
+		for (int j = 0; j < i; ++j) res += A[j] > A[i];
+	return res;
 }
 
 int main(void)
 {
 	// CHECK YOUR ARRAY TO MAKE SRUE YOUR CODE WON'T RE
-	IO >> n;
-	for (int i = 1; i <= n; ++i)
-		IO >> a[i];
-	for (int i = 1; i <= n; ++i)
-		IO >> b[i];
-	for (int i = 1; i <= n - 2; ++i) {
-		int pos = 0;
-		for (int j = i; j <= n; ++j)
-			if (b[i] == b[j]) {
-				pos = j;
-				break;
-			}
-		if (!pos) {
+	int n; IO >> n;
+	vector<int> A(n), B(n);
+	for (int i = 0; i < n; ++i) IO >> A[i];
+	for (int i = 0; i < n; ++i) IO >> B[i];
+	int revA = Getrev(A);
+	int revB = Getrev(B);
+	sort(A.begin(), A.end());
+	sort(B.begin(), B.end());
+	for (int i = 0; i < n; ++i)
+		if (A[i] != B[i]) {
 			puts("No");
 			return 0;
 		}
-		while (pos - i > 2)
-			Operate(pos - 2);
-		for (int k = 0; k < 3; ++k)
-			if (a[i] != b[i]) Operate(i);
-		if (a[i] != b[i]) {
-			puts("No");
-			return 0;
-		}
-	}
-	if (b[n] != a[n] || b[n - 1] != a[n - 1]) {
-		puts("No");
+	if (unique(A.begin(), A.end()) != A.end()) {
+		puts("Yes");
 		return 0;
 	}
-	puts("Yes");
+	puts((revA & 1) == (revB & 1) ? "Yes" : "No");
 	return 0;
 }
