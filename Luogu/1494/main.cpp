@@ -24,7 +24,7 @@ struct Query
 	bool operator<(const Query &other)
 	{
 		if (getid(l) == getid(other.l))
-			return r < other.r;
+			return getid(l) & 1 ? r < other.r : r > other.r;
 		return l < other.l;
 	}
 };
