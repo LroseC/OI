@@ -77,15 +77,20 @@ int main(void)
 		ALLA = 1ll * ALLA * inv[cnt[s[i]]] % mod;
 	}
 
+	ans = (n < m);
+	for (int i = 1; i <= 2e5; ++i)
+		if (cnt[i] != tcnt[i]) ans = 0;
 	for (int i = 1; i <= std::min(n, m); ++i) {
 		ALLA = 1ll * ALLA * inv[n - i + 1] % mod * fac[n - i] % mod;
-		ALLA = 1ll * ALLA * fac[cnt[t[i]]] % mod * inv[cnt[t[i]] - 1] % mod;
 		ans = Mod(ans + 1ll * query(t[i] - 1) * ALLA % mod);
 		if (!cnt[t[i]]) break;
 		--cnt[t[i]];
 		add(t[i], Mod(mod - A[t[i]]));
 		if (cnt[t[i]] == 0) A[t[i]] = 0;
-		else A[t[i]] = 1ll * fac[cnt[t[i]]] * inv[cnt[t[i]] - 1] % mod;
+		else {
+			ALLA = 1ll * ALLA * A[t[i]] % mod;
+			A[t[i]] = 1ll * fac[cnt[t[i]]] * inv[cnt[t[i]] - 1] % mod;
+		}
 		add(t[i], A[t[i]]);
 	}
 	printf("%d\n", ans);
