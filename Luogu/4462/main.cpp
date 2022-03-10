@@ -15,7 +15,7 @@ struct FSI
 } read;
 
 using i64 = long long;
-const int N = 1e5 + 10, B = 210;
+const int N = 1e5 + 10, B = 310;
 
 struct Query
 {
