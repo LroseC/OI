@@ -40,5 +40,7 @@ int main(void)
 		fprintf(stderr, "\n");
 	}
 	remove(".tmp.tmp");
+	remove("std");
+	remove("rand");
 	return 0;
 }
