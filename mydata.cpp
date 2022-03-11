@@ -42,6 +42,7 @@ int main(void)
 		fprintf(stderr, "\n");
 	}
 
+	fprintf(stderr, "Creating config file...\n");
 	char cfg[1024];
 	sprintf(cfg, "problem.conf", name);
 	FILE* config = fopen(cfg, "w");
@@ -59,6 +60,7 @@ int main(void)
 	fprintf(config, "output_suf out\n");
 	fprintf(config, "time_limit %d\n", TimeLimit);
 	fprintf(config, "memory_limit %d\n", MemoryLimit);
+	fprintf(stderr, "finished.");
 
 	remove(".tmp.tmp");
 	remove("std");
