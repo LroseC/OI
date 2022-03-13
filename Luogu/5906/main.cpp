@@ -16,7 +16,7 @@ struct FSI
 	}
 } read;
 
-const int N = 1e6 + 10, B = 410;
+const int N = 2e5 + 10, B = 410;
 
 struct Query
 {
