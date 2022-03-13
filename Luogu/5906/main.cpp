@@ -16,7 +16,7 @@ struct FSI
 	}
 } read;
 
-const int N = 2e5 + 10, B = 410;
+const int N = 1e6 + 10, B = 410;
 
 struct Query
 {
@@ -33,6 +33,7 @@ int A[N];
 Query q[N];
 int ans[N];
 int left[N], right[N];
+std::pair<int, int> stk[N]; int top = 0;
 
 void Add(int pos, int &res)
 {
@@ -44,7 +45,8 @@ void Add(int pos, int &res)
 }
 void Dec(int pos)
 {
-	left[A[pos]] = right[A[pos]] = 0;
+	left[A[pos]] = 0x3f3f3f3f;
+	right[A[pos]] = 0xcfcfcfcf;
 }
 
 int main(void)
@@ -86,9 +88,17 @@ int main(void)
 		else {
 			while (R < q[i].r) Add(++R, res);
 			int tmp = res;
-			for (int j = L - 1; j >= q[i].l; --j)
-				tmp = std::max(tmp, right[A[j]] - j);
-			ans[q[i].id] = tmp;
+			for (int j = L - 1; j >= q[i].l; --j) {
+				stk[++top] = std::make_pair(left[A[j]],right[A[j]]);
+				Add(j, res);
+			}
+			ans[q[i].id] = res;
+			for (int j = q[i].l; j <= L - 1; ++j) {
+				left[A[j]] = stk[top].first;
+				right[A[j]] = stk[top].second;
+				--top;
+			}
+			res = tmp;
 		}
 	}
 	for (int i = 1; i <= m; ++i)
