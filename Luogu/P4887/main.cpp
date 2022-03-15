@@ -23,17 +23,8 @@ inline int lowbit(int x) { return x & -x; }
 
 struct Scan
 {
-	int id, l, r, pos, f;
-
-	Scan(int _id, int _l, int _r, int _pos, int _f) { id = _id, l = _l, r = _r, pos = _pos, f = _f; }
-	bool operator<(const Scan &other) const
-	{
-		return pos < other.pos;
-	}
-	bool operator>(const Scan &other) const
-	{
-		return pos > other.pos;
-	}
+	int id, l, r, f;
+	Scan(int _id, int _l, int _r, int _f) { id = _id, l = _l, r = _r, f = _f; }
 };
 struct Query
 {
@@ -46,9 +37,9 @@ struct Query
 };
 
 int n, m, K;
-int a[N], cnt[N];
-i64 prefix[N], ans[N], res[N];
-std::vector<Scan> scan;
+int a[N];
+i64 cnt[N], prefix[N], ans[N], res[N];
+std::vector<Scan> scan[N];
 std::vector<int> Knum;
 
 int popcount(int x)
@@ -64,22 +55,20 @@ int popcount(int x)
 void init(void)
 {
 	for (int i = 1; i <= n; ++i) {
+		prefix[i] = cnt[a[i]];
 		for (int t : Knum)
-			prefix[i] += cnt[a[i] ^ t];
-		++cnt[a[i]];
+			++cnt[a[i] ^ t];
 	}
 	memset(cnt, 0, sizeof cnt);
 }
 void calc(void)
 {
-	std::sort(scanpre.begin(), scanpre.end(), std::less<Scan>());
-	for (int i = 1, j = 0; i <= n; ++i) {
+	for (int i = 1; i <= n; ++i) {
 		for (int t : Knum)
 			++cnt[a[i] ^ t];
-		while (j < scanpre.size() && scanpre[j].pos == i) {
-			for (int k = scanpre[j].l; k <= scanpre[j].r; ++k)
-				ans[scanpre[j].id] += scanpre[j].f * cnt[a[k]];
-			++j;
+		for (auto t : scan[i]) {
+			for (int j = t.l; j <= t.r; ++j)
+				ans[t.id] += t.f * cnt[a[j]];
 		}
 	}
 	memset(cnt, 0, sizeof cnt);
@@ -105,30 +94,33 @@ int main(void)
 		q[i].id = i;
 		read >> q[i].l >> q[i].r;
 	}
-	std::sort(q.begin(), q.end());
+//	std::sort(q.begin(), q.end());
 	int L = 1, R = 0;
 	for (int i = 0; i < m; ++i) {
 		if (L > q[i].l) {
-			scan.emplace_back(i, q[i].l, L - 1, q[i].r + 1, -1);
+			scan[q[i].r].emplace_back(i, q[i].l, L - 1, +1);
 			while (L > q[i].l)
-				ans[i] += suffix[--L];
+				ans[i] -= prefix[--L];
 		}
 		if (R < q[i].r) {
-			scan.emplace_back(i, R + 1, q[i].r, q[i].l - 1, -1);
+			scan[q[i].l - 1].emplace_back(i, R + 1, q[i].r, -1);
 			while (R < q[i].r)
 				ans[i] += prefix[++R];
 		}
 		if (L < q[i].l) {
-			scan.emplace_back(i, L, q[i].l - 1, q[i].r + 1, +1);
+			scan[q[i].r].emplace_back(i, L, q[i].l - 1, -1);
 			while (L < q[i].l)
-				ans[i] -= suffix[L++];
+				ans[i] += prefix[L++];
 		}
 		if (R > q[i].r) {
-			scan.emplace_back(i, q[i].r + 1, R, q[i].l - 1, +1);
+			scan[q[i].l - 1].emplace_back(i, q[i].r + 1, R, +1);
 			while (R > q[i].r)
 				ans[i] -= prefix[R--];
 		}
 	}
+	for (int i = 0; i < m; ++i)
+		printf("%lld ", ans[i]);
+	puts("");
 	calc();
 	for (int i = 0; i < m; ++i)
 		res[q[i].id] = ans[i];
