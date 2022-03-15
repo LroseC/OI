@@ -78,13 +78,12 @@ void calc(void)
 int main(void)
 {
 	read >> n >> m >> K;
-	if (K >= 14) {
+	if (K > 14) {
 		for (int i = 1; i <= m; ++i)
 			puts("0");
 		return 0;
 	}
-	for (int i = 1; i <= n; ++i)
-		read >> a[i];
+	for (int i = 1; i <= n; ++i) read >> a[i];
 	for (int i = 0; i < S; ++i)
 		if (popcount(i) == K) Knum.emplace_back(i);
 	init();
@@ -94,33 +93,19 @@ int main(void)
 		q[i].id = i;
 		read >> q[i].l >> q[i].r;
 	}
-//	std::sort(q.begin(), q.end());
+	std::sort(q.begin(), q.end());
+
 	int L = 1, R = 0;
 	for (int i = 0; i < m; ++i) {
-		if (L > q[i].l) {
-			scan[q[i].r].emplace_back(i, q[i].l, L - 1, +1);
-			while (L > q[i].l)
-				ans[i] -= prefix[--L];
-		}
-		if (R < q[i].r) {
-			scan[q[i].l - 1].emplace_back(i, R + 1, q[i].r, -1);
-			while (R < q[i].r)
-				ans[i] += prefix[++R];
-		}
-		if (L < q[i].l) {
-			scan[q[i].r].emplace_back(i, L, q[i].l - 1, -1);
-			while (L < q[i].l)
-				ans[i] += prefix[L++];
-		}
-		if (R > q[i].r) {
-			scan[q[i].l - 1].emplace_back(i, q[i].r + 1, R, +1);
-			while (R > q[i].r)
-				ans[i] -= prefix[R--];
-		}
+		if (R < q[i].r) scan[L - 1].emplace_back(i, R + 1, q[i].r, -1);
+		while (R < q[i].r) ans[i] += prefix[++R];
+		if (R > q[i].r) scan[L - 1].emplace_back(i, q[i].r + 1, R, +1);
+		while (R > q[i].r) ans[i] -= prefix[R--];
+		if (L > q[i].l) scan[R].emplace_back(i, q[i].l, L - 1, +1);
+		while (L > q[i].l) ans[i] -= prefix[--L] + !K;
+		if (L < q[i].l) scan[R].emplace_back(i, L, q[i].l - 1, -1);
+		while (L < q[i].l) ans[i] += prefix[L++] + !K;
 	}
-	for (int i = 0; i < m; ++i)
-		printf("%lld ", ans[i]);
-	puts("");
 	calc();
 	for (int i = 0; i < m; ++i)
 		res[q[i].id] = ans[i];
