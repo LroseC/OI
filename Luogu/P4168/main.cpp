@@ -40,14 +40,14 @@ void build(void)
 			}
 			blockRes[i][j] = res;
 		}
-		memset(cnt, 0, sizeof cnt);
+		std::memset(cnt, 0, sizeof cnt);
 	}
 	for (int i = 1; i <= id[n]; ++i) {
 		for (int j = L[i]; j <= R[i]; ++j)
 			++cnt[type[j]];
-		memcpy(blockCnt[i], cnt, sizeof cnt);
+		std::memcpy(blockCnt[i], cnt, sizeof cnt);
 	}
-	memset(cnt, 0, sizeof cnt);
+	std::memset(cnt, 0, sizeof cnt);
 }
 int query(int L, int R)
 {
@@ -58,7 +58,7 @@ int query(int L, int R)
 			if (cnt[type[i]] > cnt[res] || (cnt[type[i]] == cnt[res] && type[i] < res))
 				res = type[i];
 		}
-		memset(cnt, 0, sizeof cnt);
+		std::memset(cnt, 0, sizeof cnt);
 		return res;
 	}
 	else {
