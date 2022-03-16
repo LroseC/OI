@@ -32,7 +32,6 @@ void build(void)
 	}
 	for (int i = 1; i <= id[n]; ++i) {
 		int res = 0;
-		memset(cnt, 0, sizeof cnt);
 		for (int j = i; j <= id[n]; ++j) {
 			for (int k = L[j]; k <= R[j]; ++k) {
 				++cnt[type[k]];
@@ -41,28 +40,28 @@ void build(void)
 			}
 			blockRes[i][j] = res;
 		}
+		memset(cnt, 0, sizeof cnt);
 	}
-	memset(cnt, 0, sizeof cnt);
 	for (int i = 1; i <= id[n]; ++i) {
 		for (int j = L[i]; j <= R[i]; ++j)
 			++cnt[type[j]];
 		memcpy(blockCnt[i], cnt, sizeof cnt);
 	}
+	memset(cnt, 0, sizeof cnt);
 }
 int query(int L, int R)
 {
 	if (id[R] - id[L] <= 1) {
-		memset(cnt, 0, sizeof cnt);
 		int res = 0;
 		for (int i = L; i <= R; ++i) {
 			++cnt[type[i]];
 			if (cnt[type[i]] > cnt[res] || (cnt[type[i]] == cnt[res] && type[i] < res))
 				res = type[i];
 		}
+		memset(cnt, 0, sizeof cnt);
 		return res;
 	}
 	else {
-		memset(cnt, 0, sizeof cnt);
 		int res = blockRes[id[L] + 1][id[R] - 1];
 		auto Getcnt = [L, R](int x) { return cnt[x] + blockCnt[id[R] - 1][x] - blockCnt[id[L]][x]; };
 		for (int i = L; id[i] == id[L]; ++i) {
@@ -75,6 +74,10 @@ int query(int L, int R)
 			if (Getcnt(type[i]) > Getcnt(res) || (Getcnt(type[i]) == Getcnt(res) && type[i] < res))
 				res = type[i];
 		}
+		for (int i = L; id[i] == id[L]; ++i)
+			--cnt[type[i]];
+		for (int i = R; id[i] == id[R]; --i)
+			--cnt[type[i]];
 		return res;
 	}
 }
