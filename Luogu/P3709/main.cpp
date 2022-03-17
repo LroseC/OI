@@ -16,17 +16,17 @@ struct FSI
 	}
 } read;
 
+const int N = 2e5 + 10, B = 447;
+
 struct Query
 {
 	int id, l, r;
 	friend bool operator<(const Query &a, const Query &b)
 	{
-		if (a.l != b.l) return a.l < b.l;
+		if (a.l / B != b.l / B) return a.l < b.l;
 		return a.r < b.r;
 	}
 };
-
-const int N = 2e5 + 10, B = 1;// 447;
 
 int n, m;
 int type[N], ans[N], cnt[N];
