@@ -58,7 +58,8 @@ int query(int L, int R)
 			if (cnt[type[i]] > cnt[res] || (cnt[type[i]] == cnt[res] && type[i] < res))
 				res = type[i];
 		}
-		std::memset(cnt, 0, sizeof cnt);
+		for (int i = L; i <= R; ++i)
+			--cnt[type[i]];
 		return res;
 	}
 	else {
