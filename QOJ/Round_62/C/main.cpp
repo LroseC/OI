@@ -1,0 +1,102 @@
+#include <queue>
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+#include <climits>
+#include <algorithm>
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
+	}
+} read;
+
+const int N = 310, M = 2010;
+
+int n, m, S, T;
+int idx = 1;
+int head[N], nex[M], to[M], bf[M], f[M];
+
+void addEdge(int u, int v, int fi)
+{
+	nex[++idx] = head[u];
+	head[u] = idx;
+	to[idx] = v; bf[idx] = fi;
+}
+void Add(int u, int v)
+{
+	addEdge(u, v, 1);
+	addEdge(v, u, 1);
+}
+void build(void) { std::memcpy(f, bf, sizeof bf); }
+
+namespace Dinic
+{
+	int d[N], now[N];
+	bool BFS(void)
+	{
+		std::queue<int> q;
+		std::memset(d, 0, sizeof d);
+		std::memcpy(now, head, sizeof head);
+		q.emplace(S);
+		d[S] = 1;
+		while (q.size()) {
+			int u = q.front(); q.pop();
+			for (int e = head[u]; e; e = nex[e])
+				if (f[e] && !d[to[e]]) {
+					d[to[e]] = d[u] + 1;
+					if (to[e] == T) return 1;
+					q.emplace(to[e]);
+				}
+		}
+		return 0;
+	}
+	int dfs(int u, int flow)
+	{
+		if (u == T)
+			return flow;
+		int rest = flow;
+		for (int e = now[u]; rest && e; e = nex[e]) {
+			now[u] = e;
+			if (!f[e] || d[to[e]] != d[u] + 1) continue;
+			int tmp = dfs(to[e], std::min(rest, f[e]));
+			if (tmp == 0) d[to[e]] = 0;
+			rest -= tmp;
+			f[e] -= tmp;
+			f[e ^ 1] += tmp;
+		}
+		return flow - rest;
+	}
+	int main(void)
+	{
+		int res = 0;
+		while (BFS())
+			res += dfs(S, INT_MAX);
+		return res;
+	}
+}
+
+int main(void)
+{
+	read >> n >> m;
+	for (int i = 1; i <= m; ++i) {
+		int u, v; read >> u >> v;
+		Add(u, v);
+	}
+	int ans = m;
+	for (int i = 1; i <= n; ++i)
+		for (int j = 1; j <= n; ++j)
+			if (i != j) {
+				build();
+				S = i, T = j;
+				ans = std::min(ans, Dinic::main());
+			}
+	printf("%d\n", ans);
+	return 0;
+}
