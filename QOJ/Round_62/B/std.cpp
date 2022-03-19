@@ -46,7 +46,7 @@ struct Matrix
 int n, m, C;
 int A[N], B[N];
 int f[N][30];
-Matrix tr[N << 2];
+std::vector<int> tr[N << 2];
 
 int qpow(int base, int k)
 {
@@ -60,28 +60,32 @@ int qpow(int base, int k)
 }
 int Getinv(int x) { return qpow(x, mod - 2); }
 
+std::vector<int> merge(std::vector<int> a, std::vector<int> b)
+{
+	std::vector<int> res(C);
+	for (int i = 0; i < C; ++i)
+		for (int j = 0; j + i < C; ++j)
+			res[i + j] = (res[i + j] + 1ll * a[i] * b[j]) % mod;
+	return res;
+}
 void build(int u = 1, int l = 1, int r = n)
 {
-	tr[u] = Matrix(C, C);
+	tr[u].resize(C);
 	if (l == r) {
-		for (int j = 0; j < C; ++j) {
-			if (j != 0) tr[u].val[j - 1][j] = A[l];
-			tr[u].val[j][j] = B[l];
-		}
+		tr[u][0] = B[l];
+		tr[u][1] = A[l];
 		return;
 	}
 	int mid = l + r >> 1;
 	build(u << 1, l, mid);
 	build(u << 1 | 1, mid + 1, r);
-	tr[u] = tr[u << 1] * tr[u << 1 | 1];
+	tr[u] = merge(tr[u << 1], tr[u << 1 | 1]);
 }
 void change(int pos, int u = 1, int l = 1, int r = n)
 {
 	if (l == r) {
-		for (int j = 0; j < C; ++j) {
-			if (j != 0) tr[u].val[j - 1][j] = A[l];
-			tr[u].val[j][j] = B[l];
-		}
+		tr[u][0] = B[l];
+		tr[u][1] = A[l];
 		return;
 	}
 	int mid = l + r >> 1;
@@ -89,7 +93,7 @@ void change(int pos, int u = 1, int l = 1, int r = n)
 		change(pos, u << 1, l, mid);
 	else
 		change(pos, u << 1 | 1, mid + 1, r);
-	tr[u] = tr[u << 1] * tr[u << 1 | 1];
+	tr[u] = merge(tr[u << 1], tr[u << 1 | 1]);
 }
 
 int main(void)
@@ -116,12 +120,9 @@ int main(void)
 		A[pos] = a;
 		B[pos] = b;
 		change(pos);
-		Matrix res(1, C);
-		res.val[0][0] = 1;
-		res = res * tr[1];
 		int tans = ans;
 		for (int c = 0; c < C; ++c)
-			tans = Mod(tans - res.val[0][c] + mod);
+			tans = Mod(tans - tr[1][c] + mod);
 		printf("%d\n", tans);
 	}
 	return 0;
