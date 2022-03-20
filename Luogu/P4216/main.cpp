@@ -42,9 +42,10 @@ int main(void)
 	std::sort(cg.begin(), cg.end());
 	int i = 0, j = 0;
 	for (int tim = 1; tim <= m; ++tim) {
-		if (j < cg.size() && cg[i].tim == tim) {
+		if (j < cg.size() && cg[i].tim == tim)
+			color(cg.u);
+		while (i < q.size() && q[i].tim == tim) {
 		}
-		while (i < q.size() && q[i].tim == tim)
 	}
 	return 0;
 }
