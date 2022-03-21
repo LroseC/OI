@@ -1,0 +1,63 @@
+#include <vector>
+#include <cctype>
+#include <cstdio>
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
+	}
+} read;
+
+using i64 = long long;
+const int N = 1010;
+
+int n, m;
+std::vector<int> headA[64];
+std::vector<int> headB[64];
+std::vector<int> nums;
+bool haveEdge[N][N];
+
+int main(void)
+{
+	freopen("shop.in", "r", stdin);
+	freopen("shop.out", "w", stdout);
+	read >> n >> m;
+	for (int i = 1; i <= n; ++i)
+		read >> c[i];
+	for (int i = 1; i <= n; ++i) {
+		read >> v[i];
+		nums.emplace_back(v[i]);
+	}
+	for (int i = 1; i <= m; ++i) {
+		read >> a[i];
+		for (int j = 0; j < 64; ++j)
+			if ((c[a[i]] >> j) & 1) headA[j].emplace_back(a[i]);
+	}
+	for (int i = 1; i <= m; ++i) {
+		read >> b[i];
+		for (int j = 0; j < 64; ++j)
+			if ((c[b[i]] >> j) & 1) headB[j].emplace_back(b[i]);
+	}
+	for (int i = 1; i <= n; ++i)
+		haveEdge[i][i] = 1;
+	for (int i = 1; i <= n; ++i)
+		for (int j = 0; j < 64; ++j)
+			if ((c[i] >> j) & 1) {
+				for (int v : headB[j])
+					T[i].emplace_back(v);
+				for (int u : headA[j])
+					T[u].emplace_back(i);
+			}
+	std::sort(nums.begin(), nums.end());
+	for (int i = 1; i <= n; ++i)
+		v[i] = std::lower_bound(nums.begin(), nums.end(), v[i]) - nums.begin();
+	tarjan(1, 1);
+	printf("%d\n", toposort());
+	return 0;
+}

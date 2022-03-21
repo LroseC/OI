@@ -1,0 +1,148 @@
+#include <vector>
+#include <cctype>
+#include <cstdio>
+#include <algorithm>
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		res = res * f; return *this;
+	}
+} read;
+
+using i64 = long long;
+
+const int N = 2e6 + 10;
+
+struct Change
+{
+	int op;
+	int type, tem, v;
+	int k;
+
+	Change(void) {}
+	Change(int _op, int _t, int _tem, int _v)
+	{
+		op = _op, type = _t, tem = _tem, v = _v;
+	}
+	Change(int _op, int _k)
+	{
+		op = _op, k = _k;
+	}
+};
+
+int m;
+std::vector<int> nums;
+int sum[N << 2][2];
+Change cg[N];
+
+inline int getAns(int a, int b) { return std::min(a, b) * 2; }
+void maintain(int u)
+{
+	sum[u][0] = sum[u << 1][0] + sum[u << 1 | 1][0];
+	sum[u][1] = sum[u << 1][1] + sum[u << 1 | 1][0];
+}
+void build(int u = 1, int l = 0, int r = nums.size())
+{
+	if (l == r) {
+		sum[u][0] = sum[u][1] = 0;
+		return;
+	}
+	int mid = l + r >> 1;
+	build(u << 1, l, mid);
+	build(u << 1 | 1, mid + 1, r);
+	maintain(u);
+}
+void add(int type, int pos, int val, int u = 1, int l = 0, int r = nums.size())
+{
+	if (l == r) {
+		sum[u][type] += val;
+		return;
+	}
+	int mid = l + r >> 1;
+	if (pos <= mid)
+		add(type, pos, val, u << 1, l, mid);
+	else
+		add(type, pos, val, u << 1 | 1, mid + 1, r);
+	maintain(u);
+}
+std::pair<int, int> calc(void)
+{
+	int u = 1, l = 0, r = nums.size();
+	int res = 0, resl = 0, resr = 0;
+	int nowsum[2], ressum[2];
+	nowsum[0] = nowsum[1] = 0;
+	ressum[0] = ressum[1] = 0;
+	while (l < r) {
+		if (getAns(sum[u << 1][0] + nowsum[0], sum[u << 1 | 1][1] + nowsum[1]) >= getAns(sum[res][0] + ressum[0], ressum[1])) {
+			int mid = l + r >> 1;
+			res = u << 1;
+			resl = l;
+			resr = mid;
+			ressum[0] = nowsum[0];
+			ressum[1] = nowsum[1] + sum[u << 1 | 1][1];
+
+			nowsum[0] += sum[u << 1][0];
+			u = u << 1 | 1;
+			l = mid + 1;
+		}
+		else {
+			nowsum[1] += sum[u << 1 | 1][1];
+			int mid = l + r >> 1;
+			u = u << 1;
+			r = mid;
+		}
+	}
+	if (!res) return std::make_pair(0, 0);
+	while (resl < resr) {
+		ressum[0] += sum[res << 1][0];
+		int mid = resl + resr >> 1;
+		res = res << 1 | 1;
+		resl = mid + 1;
+	}
+	return std::make_pair(resl, getAns(ressum[0] + sum[res][0], ressum[1]));
+}
+
+int main(void)
+{
+	read >> m;
+	for (int tim = 1; tim <= m; ++tim) {
+		int op; read >> op;
+		if (op == 1) {
+			int type, tem, v;
+			read >> type >> tem >> v;
+			nums.emplace_back(tem);
+			cg[tim] = Change(op, type, tem, v);
+		}
+		else {
+			int k;
+			read >> k;
+			cg[tim] = Change(op, k);
+		}
+	}
+	std::sort(nums.begin(), nums.end());
+	nums.erase(std::unique(nums.begin(), nums.end()), nums.end());
+
+	build();
+	for (int tim = 1; tim <= m; ++tim) {
+		if (cg[tim].op == 1) {
+			cg[tim].tem = std::lower_bound(nums.begin(), nums.end(), cg[tim].tem) - nums.begin();
+			add(cg[tim].type, cg[tim].tem, cg[tim].v);
+		}
+		else {
+			int k = cg[tim].k;
+			add(cg[k].type, cg[k].tem, -cg[k].v);
+		}
+		auto res = calc();
+		if (res.second == 0)
+			puts("Peace");
+		else
+			printf("%d %d\n", nums[res.first], res.second);
+	}
+	return 0;
+}
