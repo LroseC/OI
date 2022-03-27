@@ -1,8 +1,8 @@
 #include <queue>
 #include <cctype>
 #include <cstdio>
-#include <climits>
 #include <cstring>
+#include <climits>
 #include <algorithm>
 
 struct FSI
@@ -17,18 +17,21 @@ struct FSI
 	}
 } read;
 
-const int N = 1e5, M = 1e6;
+using i64 = long long;
+const int N = 1e4, M = 1e5;
 
 int n, m, S = N - 1, T = N - 2;
-int idx = 1, head[N], nex[M], to[M], f[M];
+char tmp[100010];
+int idx = 1, head[N], nex[M], to[M];
+i64 f[M];
 
-void addEdge(int u, int v, int fi)
+void addEdge(int u, int v, i64 fi)
 {
 	nex[++idx] = head[u];
 	head[u] = idx;
 	to[idx] = v, f[idx] = fi;
 }
-void addFlow(int u, int v, int f)
+void addFlow(int u, int v, i64 f)
 {
 	addEdge(u, v, f);
 	addEdge(v, u, 0);
@@ -56,51 +59,61 @@ namespace Dinic
 		}
 		return 0;
 	}
-	int dfs(int u, int flow)
+	i64 dfs(int u, i64 flow)
 	{
 		if (u == T)
 			return flow;
-		int rest = flow;
+		i64 rest = flow;
 		for (int e = now[u]; rest && e; e = nex[e])
 			if (f[e] && d[to[e]] == d[u] + 1) {
 				now[u] = e;
-				int tmp = dfs(to[e], std::min(rest, f[e]));
-				if (tmp == 0) d[to[e]] = 0;
+				i64 tmp = dfs(to[e], std::min(f[e], rest));
+				if (!tmp) d[to[e]] = 0;
 				rest -= tmp;
 				f[e] -= tmp;
 				f[e ^ 1] += tmp;
 			}
 		return flow - rest;
 	}
-	int main(void)
+	i64 main(void)
 	{
-		int res = 0;
+		i64 res = 0;
 		while (BFS())
-			res += dfs(S, INT_MAX);
+			res += dfs(S, LLONG_MAX);
 		return res;
 	}
 }
 
 int main(void)
 {
-	read >> n >> m;
-	for (int i = 1; i <= n; ++i)
-		addFlow(S, i, 1);
-	for (int i = n + 1; i <= m; ++i)
-		addFlow(i, T, 1);
-	while (true) {
-		int u, v;
-		read >> u >> v;
-		if (u == -1 && v == -1)
-			break;
-		addFlow(u, v, 1);
+	read >> m >> n;
+	i64 res = 0;
+	for (int i = 1; i <= m; ++i) {
+		int w; read >> w;
+		addFlow(S, i, w);
+		res += w;
+		int top = 0;
+		do tmp[++top] = getchar();
+		while (tmp[top] != '\n' && tmp[top] != '\r');
+		int pos = 0;
+		while (pos < top) {
+			int res = 0; int f = 1; char ch = tmp[++pos];
+			while (pos < top && !isdigit(ch)) { if (ch == '-') f = -1; ch = tmp[++pos]; }
+			while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = tmp[++pos]; }
+			addFlow(i, m + res, 0x3f3f3f3f3f3f3f3f);
+		}
 	}
-	printf("%d\n", Dinic::main());
+	for (int i = 1; i <= n; ++i) {
+		int w; read >> w;
+		addFlow(i + m, T, w);
+	}
+	res -= Dinic::main();
+	for (int i = 1; i <= m; ++i)
+		if (Dinic::d[i]) printf("%d ", i);
+	puts("");
 	for (int i = 1; i <= n; ++i)
-		for (int e = head[i]; e; e = nex[e])
-			if (to[e] != S && f[e] == 0) {
-				printf("%d %d\n", i, to[e]);
-				break;
-			}
+		if (Dinic::d[i + m]) printf("%d ", i);
+	puts("");
+	printf("%lld\n", res);
 	return 0;
 }
