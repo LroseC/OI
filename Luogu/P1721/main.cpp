@@ -49,7 +49,10 @@ int main(void)
 	for (int i = 1; i <= m; ++i) {
 		int hh = 1, tt = 0;
 		for (int j = 2; j <= n; ++j) {
-			while (hh <= tt && 
+			while (hh < tt && slope(q[hh], q[hh + 1]) <= slope(q[hh + 1], Vector(j, s[j])))
+				++hh;
+			f[i][j] = slope(q[hh + 1], Vector(j, s[j]));
+			while (hh < tt && slope(q[tt - 1], q[tt])
 		}
 	return 0;
 }
@@ -62,5 +65,5 @@ int main(void)
    这样不用同时维护多个单调队列了。。。
    上式可以巧妙看做点 (j, s[j]) 到(k, s[k] - f[i - 1][k]) 的斜率.
    显然有 s[k] - f[i - 1][k] < s[j];
-   此时我们可以肯定地说这个决策具有单调性，可以维护一个下凸包转移.
+   此时我们可以肯定地说这个决策具有单调性，可以维护一个下凸壳转移.
 */
