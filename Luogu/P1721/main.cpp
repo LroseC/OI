@@ -1,6 +1,7 @@
 #include <vector>
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 struct FSI
 {
@@ -28,14 +29,29 @@ struct FSI
    这题太恶心了.
 */
 
+const int N = 8010;
+using ld = long double;
+
+struct Vector
+{
+	int id;
+	long double x, y;
+};
+
 int n, m, P;
 int idx, h[N];
-int f[2][N];
+long double f[2][N];
+long long s[N];
+short pre[N][N];
+Vector q[N];
+long double X[N], Y[N];
+long double ans = 0;
+
+long double slope(Vector a, Vector b) { return (b.y - a.y) / (b.x - a.x); }
 
 int main(void)
 {
 	read >> n >> m >> P;
-	h.emplace_back(0);
 	for (int i = 1; i <= n; ++i) {
 		int x; read >> x;
 		if (!idx || x > h[1])
@@ -43,17 +59,31 @@ int main(void)
 	}
 	n = idx;
 	std::sort(h + 1, h + 1 + n);
+	for (int i = 1; i <= n; ++i) {
+		s[i] = s[i - 1] + h[i];
+		printf("s[%d] = %lld\n", i, s[i]);
+	}
 	m = std::min(n, m);
 	for (int i = 1; i <= n; ++i)
 		f[0][i] = h[1];
 	for (int i = 1; i <= m; ++i) {
 		int hh = 1, tt = 0;
+		for (int j = 1; j <= n; ++j)
+			X[j] = j,  Y[j] = s[j] - f[(i - 1) & 1][j];
+		f[i & 1][1] = h[1];
+		q[++tt] = Vector({1, 1, (ld)h[1]});
 		for (int j = 2; j <= n; ++j) {
-			while (hh < tt && slope(q[hh], q[hh + 1]) <= slope(q[hh + 1], Vector(j, s[j])))
+			while (hh < tt && slope(q[hh], q[hh + 1]) <= slope(q[hh], Vector({0, (ld)j + 1, (ld)s[j]})))
 				++hh;
-			f[i][j] = slope(q[hh + 1], Vector(j, s[j]));
-			while (hh < tt && slope(q[tt - 1], q[tt])
+			pre[i][j] = q[hh].id;
+			f[i & 1][j] = slope(q[hh], Vector({0, (ld)j + 1, (ld)s[j]}));
+			while (hh < tt && slope(q[tt - 1], q[tt]) <= slope(q[tt - 1], Vector({0, X[j], Y[j]})))
+				--tt;
+			q[++tt] = Vector({j, X[j], Y[j]});
+			ans = std::max(ans, f[i & 1][j]);
 		}
+	}
+	printf("%Lf\n", ans);
 	return 0;
 }
 /*
