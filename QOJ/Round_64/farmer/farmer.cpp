@@ -171,7 +171,7 @@ std::pair<int, int> queryPath(int u)
 bool check(int u)
 {
 	if (u == root) return 1;
-	auto t = queryPath(top[u] == u ? u : fa[u]);
+	auto t = queryPath(u);
 	return val[u] < t.first && val[u] > t.second;
 }
 
