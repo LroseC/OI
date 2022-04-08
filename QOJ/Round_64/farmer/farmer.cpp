@@ -23,19 +23,18 @@ int n, m, root;
 int ch[N][2];
 int val[N], type[N];
 int idx, L[N], R[N], invL[N];
-int sz[N], fa[N], son[N], dep[N], top[N];
+int sz[N], fa[N], son[N], top[N];
 int minx[N << 2][2], maxx[N << 2][2], typex[N << 2], tag[N << 2];
 bool isSon[N];
 
 PII merge(PII a, PII b) { return std::make_pair(std::min(a.first, b.first), std::max(a.second, b.second)); }
-void getSon(int u, int depth)
+void getSon(int u)
 {
 	sz[u] = 1;
-	dep[u] = depth;
 	for (int i = 0; i < 2; ++i)
 		if (ch[u][i]) {
 			fa[ch[u][i]] = u;
-			getSon(ch[u][i], depth + 1);
+			getSon(ch[u][i]);
 			sz[u] += sz[ch[u][i]];
 			if (sz[ch[u][i]] > sz[son[u]])
 				son[u] = ch[u][i];
@@ -152,25 +151,25 @@ int queryType(int pos, int u = 1, int l = 1, int r = n)
 std::pair<int, int> queryPath(int u)
 {
 	std::pair<int, int> res = std::make_pair(INT_MAX, INT_MIN);
-	while (fa[u]) {
+	while (u != root) {
 		if (top[u] == u) {
 			u = fa[u];
-			int tp = queryType(u) ^ 1;
+			int tp = queryType(L[u]) ^ 1;
 			if (tp == 0)
 				res.first = std::min(res.first, val[u]);
 			else
 				res.second = std::max(res.second, val[u]);
-			if (!fa[u]) return res;
 		}
-		u = fa[u];
-		res = merge(res, query(L[top[u]], L[u]));
-		u = top[u];
+		else {
+			u = fa[u];
+			res = merge(res, query(L[top[u]], L[u]));
+			u = top[u];
+		}
 	}
 	return res;
 }
 bool check(int u)
 {
-	if (u == root) return 1;
 	auto t = queryPath(u);
 	return val[u] < t.first && val[u] > t.second;
 }
@@ -190,7 +189,7 @@ int main(void)
 			root = i;
 			break;
 		}
-	getSon(root, 1);
+	getSon(root);
 	initCut(root, root);
 	build();
 	while (m--) {
