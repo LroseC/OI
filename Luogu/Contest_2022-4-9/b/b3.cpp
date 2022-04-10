@@ -24,21 +24,21 @@ int sz[N];
 int f[N][10010];
 std::vector<int> G[N];
 
-void dp(int u, int fa, int m)
+void dp(int u, int fa)
 {
 	sz[u] = a[u];
 	for (int v : G[u])
 		if (v != fa) {
 			dp(v, u);
 			sz[u] += sz[v];
-			for (int i = std::min(sz[u], m); i >= a[u]; --i)
-				for (int j = 0; j <= std::min(i, sz[v]); ++j)
+			for (int i = m; i >= 0; --i)
+				for (int j = 0; j <= i; ++j)
 					f[u][i] = std::max(f[u][i], f[u][i - j] + f[v][j]);
 		}
-	for (int i = std::min(sz[u], m); i >= a[u]; --i) {
+	for (int i = m; i >= a[u]; --i)
 		f[u][i] = f[u][i - a[u]] + b[u];
+	for (int i = 1; i <= m; ++i)
 		ans = std::max(ans, f[u][i]);
-	}
 }
 
 int main(void)
@@ -52,7 +52,7 @@ int main(void)
 		G[u].emplace_back(v);
 		G[v].emplace_back(u);
 	}
-	dp(1, 0, m);
+	dp(1, 0);
 	printf("%d\n", ans);
 	return 0;
 }
