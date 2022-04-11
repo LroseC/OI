@@ -24,7 +24,7 @@ const int N = 200, M = 12010;
 struct Edge
 {
 	int u, v;
-	i64 w;
+	int w;
 
 	Edge(void) {}
 	Edge(int _u, int _v, int _w) { u = _u, v = _v, w = _w; }
@@ -34,7 +34,7 @@ struct Edge
 int n, m, S, T;
 int a[N], a1[N], a2[N], sz[N], fa[N];
 int idx = 1, head[N], nex[M], to[M];
-i64 ofl[M], fl[M];
+int ofl[M], fl[M];
 std::vector<Edge> edge;
 
 void clear(void)
@@ -43,18 +43,18 @@ void clear(void)
 	std::memset(head, 0, sizeof head);
 	edge.clear();
 }
-void addEdge(int u, int v, i64 f)
+void addEdge(int u, int v, int f)
 {
 	nex[++idx] = head[u];
 	head[u] = idx;
-	to[idx] = v, fl[idx] = f;
+	to[idx] = v, ofl[idx] = f;
 }
-void addFlow(int u, int v, i64 f)
+void addFlow(int u, int v, int f)
 {
 	addEdge(u, v, f);
 	addEdge(v, u, 0);
 }
-void addTree(int u, int v, i64 w)
+void addTree(int u, int v, int w)
 {
 	edge.emplace_back(u, v, w);
 }
@@ -80,15 +80,15 @@ namespace dinic
 		}
 		return 0;
 	}
-	i64 dfs(int u, i64 flow)
+	int dfs(int u, int flow)
 	{
 		if (u == T)
 			return flow;
-		i64 rest = flow;
+		int rest = flow;
 		for (int e = now[u]; rest && e; e = nex[e])
 			if (fl[e] && d[to[e]] == d[u] + 1) {
 				now[u] = e;
-				i64 tmp = dfs(to[e], std::min(fl[e], rest));
+				int tmp = dfs(to[e], std::min(fl[e], rest));
 				if (!tmp) d[to[e]] = 0;
 				rest -= tmp;
 				fl[e] -= tmp;
@@ -96,12 +96,12 @@ namespace dinic
 			}
 		return flow - rest;
 	}
-	i64 main(void)
+	int main(void)
 	{
 		std::memcpy(fl, ofl, sizeof ofl);
-		i64 res = 0;
+		int res = 0;
 		while (BFS())
-			res += dfs(S, LLONG_MAX);
+			res += dfs(S, INT_MAX);
 		return res;
 	}
 }
@@ -126,14 +126,13 @@ void build(int l, int r)
 	build(mid + 1, r);
 }
 int find(int x) { return x == fa[x] ? x : fa[x] = find(fa[x]); }
-int query(i64 x)
+int query(int x)
 {
 	for (int i = 1; i <= n; ++i) {
 		sz[i] = 1;
 		fa[i] = i;
 	}
 	int res = 0;
-	return res;
 	for (auto e : edge) {
 		int u = find(e.u), v = find(e.v);
 		if (e.w <= x)
@@ -150,7 +149,7 @@ int main(void)
 	while (T--) {
 		read >> n >> m;
 		for (int i = 1; i <= m; ++i) {
-			int u, v; i64 w;
+			int u, v; int w;
 			read >> u >> v >> w;
 			addFlow(u, v, w);
 			addFlow(v, u, w);
