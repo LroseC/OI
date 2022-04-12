@@ -44,7 +44,7 @@ int main(void)
 
 	fprintf(stderr, "Creating config file...\n");
 	char cfg[1024];
-	sprintf(cfg, "problem.conf", name);
+	sprintf(cfg, "problem.conf");
 	FILE* config = fopen(cfg, "w");
 	fprintf(config, "use_builtin_judger on\nuse_builtin_checker ncmp\n");
 	fprintf(config, "n_tests %d\n", T);
