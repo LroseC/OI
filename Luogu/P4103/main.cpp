@@ -1,5 +1,9 @@
+#include <tuple>
+#include <vector>
 #include <cctype>
 #include <cstdio>
+#include <climits>
+#include <algorithm>
 
 struct FSI
 {
@@ -16,8 +20,12 @@ struct FSI
 using i64 = long long;
 const int N = 1e6 + 10, LG = 22;
 
-int n;
-int id[N], dep[N], fa[N][LG];
+int n, m, stk[N];
+int idx, id[N], dep[N], fa[N][LG];
+bool isKey[N];
+int cnt[N], minx[N], maxx[N];
+i64 sum[N];
+std::vector<int> G[N];
 
 void initLCA(int u)
 {
@@ -28,22 +36,34 @@ void initLCA(int u)
 	for (int v : G[u])
 		if (v != fa[u][0]) {
 			fa[v][0] = u;
-			initLCA(v, u);
+			initLCA(v);
 		}
 }
 int LCA(int u, int v)
 {
 	if (dep[u] < dep[v])
 		std::swap(u, v);
+	for (int i = LG - 1; i >= 0; --i)
+		if (dep[fa[u][i]] >= dep[v])
+			u = fa[u][i];
+	if (u == v) return u;
+	for (int i = LG - 1; i >= 0; --i)
+		if (fa[u][i] != fa[v][i]) {
+			u = fa[u][i];
+			v = fa[v][i];
+		}
+	return fa[u][0];
 }
 void build(int K, std::vector<int> &h)
 {
 	int top = 0;
 	stk[++top] = 1;
+	G[1].clear();
 	for (int i = 0, d; i < K; ++i) {
+		if (h[i] == 1) continue;
 		d = LCA(h[i], stk[top]);
 		if (d != stk[top]) {
-			while (id[d] < stk[top - 1]) {
+			while (id[d] < id[stk[top - 1]]) {
 				G[stk[top - 1]].emplace_back(stk[top]);
 				--top;
 			}
@@ -73,17 +93,20 @@ std::tuple<i64, int, int> calc(int u)
 	i64 res1 = 0;
 	int res2 = INT_MAX, res3 = INT_MIN;
 	for (int v : G[u]) {
-		calc(v);
+		auto t = calc(v);
+		res1 += std::get<0>(t);
+		res2 = std::min(res2, std::get<1>(t));
+		res3 = std::max(res3, std::get<2>(t));
 		cnt[u] += cnt[v];
 		sum[u] += sum[v];
-		res2 = std::min(res2, minx[u] + minx[v] + 1);
-		res3 = std::max(res3, maxx[u] + maxx[v] + 1);
-		minx[u] = std::min(minx[u], minx[v] + 1);
-		maxx[u] = std::max(maxx[u], maxx[v] + 1);
+		res2 = std::min(res2, minx[u] + minx[v] + dep[v] - dep[u]);
+		res3 = std::max(res3, maxx[u] + maxx[v] + dep[v] - dep[u]);
+		minx[u] = std::min(minx[u], minx[v] + dep[v] - dep[u]);
+		maxx[u] = std::max(maxx[u], maxx[v] + dep[v] - dep[u]);
 	}
 	for (int v : G[u]) {
 		int sz = cnt[u] - cnt[v];
-		res1 += sz * (sum[v] - dep[u] * cnt[v]);
+		res1 += sz * (sum[v] - 1ll * dep[u] * cnt[v]);
 	}
 	return std::make_tuple(res1, res2, res3);
 }
@@ -94,7 +117,7 @@ int main(void)
 	for (int i = 1, u, v; i < n; ++i) {
 		read >> u >> v;
 		G[u].emplace_back(v);
-		G[v].epplace_back(u);
+		G[v].emplace_back(u);
 	}
 	initLCA(1);
 	for (int i = 1; i <= n; ++i)
@@ -107,7 +130,7 @@ int main(void)
 			read >> h[i];
 			isKey[h[i]] = 1;
 		}
-		auto cmp = [](int a, int b) { return id[a] < id[b]; }
+		auto cmp = [](int a, int b) { return id[a] < id[b]; };
 		std::sort(h.begin(), h.end(), cmp);
 		build(K, h);
 		auto t = calc(1);
