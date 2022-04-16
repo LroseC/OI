@@ -96,24 +96,22 @@ int calc(int u)
 	for (int v : G[u]) {
 		if (isKey[v] && dep[v] == dep[u] + 1)
 			++flag;
-		if (isKey[v])
-			tmp += f[v] + 1;
-		else
-			tmp += std::min(f[v] + 1, g[v]);
+		tmp += std::min(f[v] + 1, g[v] + (isKey[v] && dep[v] != dep[u] + 1));
 	}
 	if (flag == 0)
 		g[u] = std::min(g[u], tmp);
 	if (isKey[u] || flag >= 2)
 		f[u] = g[u];
 	else {
+		f[u] = g[u];
 		int sum = 0;
 		for (int v : G[u])
-			sum += g[v];
+			sum += g[v] + (isKey[v] && dep[v] != dep[u] + 1);
 		for (int v : G[u]) {
 			if (flag == 0)
-				f[u] = std::min(f[u], sum - g[v] + f[v]);
+				f[u] = std::min(f[u], sum - g[v] - (isKey[v] && dep[v] != dep[u] + 1) + f[v]);
 			else if (isKey[v] && dep[v] == dep[u] + 1)
-				f[u] = std::min(f[u], sum - g[v] + f[v]);
+				f[u] = std::min(f[u], sum - g[v] - (isKey[v] && dep[v] != dep[u] + 1) + f[v]);
 		}
 	}
 	return f[u];
