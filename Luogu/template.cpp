@@ -8,8 +8,8 @@ struct FSI
 	{
 		res = 0; T f = 1; char ch = getchar();
 		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
-		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
-		res = res * f; return *this;
+		while (isdigit(ch)) { res = res * 10 + (ch - '0') * f; ch = getchar(); }
+		return *this;
 	}
 } read;
 
