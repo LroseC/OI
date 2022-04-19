@@ -6,13 +6,15 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <unordered_set>
+#include <unordered_map>
 
-const int MAXLEN = 110;
+const int MAXLEN = 210;
 
 int n, top;
 char line[110][MAXLEN];
-std::set<std::string> inEx;
-std::map<std::string, std::string> M;
+std::unordered_set<std::string> inEx;
+std::unordered_map<std::string, std::string> M;
 std::string stk[1010];
 
 void remove(int len, char str[])
@@ -34,25 +36,22 @@ void insert(int len, char str[])
 }
 std::string expand(int len, std::string &str)
 {
-//	std::cout << str << std::endl;
 	std::vector<std::string> tmp;
 	std::string t, res;
-	for (int i = 0; i < str[i]; ++i) {
-		if (isalpha(str[i]) || isdigit(str[i]) || str[i] == '_')
-			t.push_back(str[i]);
+	int last = -1;
+	for (int i = 0; i < len; ++i) {
+		if (isalpha(str[i]) || isdigit(str[i]) || str[i] == '_') {
+			if (last == -1) last = i;
+		}
 		else {
-			tmp.emplace_back(t);
-			t.clear();
-			t.push_back(str[i]);
-			tmp.emplace_back(t);
-			t.clear();
+			if (last != -1)
+				tmp.emplace_back(str.substr(last, i - last));
+			tmp.emplace_back(str.substr(i, 1));
+			last = -1;
 		}
 	}
-	tmp.emplace_back(t);
-	t.clear();
-//	for (auto &t : tmp)
-//		std::cout << "\"" << t << "\"" << ' ';
-//	std::cout << '\n';
+	if (last != -1)
+		tmp.emplace_back(str.substr(last, len - last));
 	int bktop = top;
 	for (auto &t : tmp) {
 		if (!M.count(t) || inEx.count(t))
@@ -70,8 +69,9 @@ std::string expand(int len, std::string &str)
 
 int main(void)
 {
-	freopen("preprocessor.in", "r", stdin);
-	freopen("preprocessor.out", "w", stdout);
+	std::ios::sync_with_stdio(0);
+	std::cin.tie(NULL);
+	std::cout.tie(NULL);
 	scanf("%d", &n);
 	fgets(line[0], MAXLEN, stdin);
 	for (int i = 1; i <= n; ++i) {
@@ -90,7 +90,7 @@ int main(void)
 			auto t = expand(len, tmp);
 			std::cout << t;
 		}
-		puts("");
+		std::cout << std::endl;
 	}
 	return 0;
 }
