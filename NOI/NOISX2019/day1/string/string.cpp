@@ -28,11 +28,10 @@ int lena[N], lenb[N];
 int lg2[N], st[N][LG];
 char str[N];
 int sa[N], rk[N], x[N], y[N], c[N], height[N];
-int segCnt;
-int id[N << 5], inEdge[N << 5];
-int ch[N << 5][2];
-std::vector<int> G[N << 5];
-i64 f[N << 5];
+int inEdge[N << 6];
+int ch[N << 6][2];
+std::vector<int> G[N << 6];
+i64 f[N << 6];
 
 void buildSA(void)
 {
@@ -89,51 +88,39 @@ int queryST(int l, int r)
 	int t = lg2[r - l + 1];
 	return std::min(st[l][t], st[r - (1 << t) + 1][t]);
 }
-void buildSeg(int u = 1, int l = 1, int r = n)
-{
-	segCnt = std::max(segCnt, u);
-	id[u] = ++idx;
-	ch[u][0] = ch[u][1] = 0;
-	inEdge[id[u]] = 0;
-	G[id[u]].clear();
-	if (l == r)
-		return;
-	int mid = l + r >> 1;
-	ch[u][0] = u << 1, ch[u][1] = u << 1 | 1;
-	buildSeg(u << 1, l, mid);
-	buildSeg(u << 1 | 1, mid + 1, r);
-	G[id[u]].emplace_back(id[u << 1]);
-	G[id[u]].emplace_back(id[u << 1 | 1]);
-	printf("%d->%d\n", id[u], id[u << 1]);
-	printf("%d->%d\n", id[u], id[u << 1 | 1]);
-	inEdge[id[u << 1]] = inEdge[id[u << 1 | 1]] = 1;
-}
 int add(int pos, int v, int rt, int l = 1, int r = n)
 {
-	int u = ++segCnt;
-	id[u] = ++idx;
+	int u = ++idx;
 	ch[u][0] = ch[rt][0];
 	ch[u][1] = ch[rt][1];
-	G[id[u]].emplace_back(id[rt]);
-	++inEdge[id[rt]];
+	if (rt) {
+		G[u].emplace_back(rt);
+		++inEdge[rt];
+	}
 	if (l == r) {
-		G[id[u]].emplace_back(v);
+		G[u].emplace_back(v);
 		++inEdge[v];
 		return u;
 	}
 	int mid = l + r >> 1;
-	if (pos <= mid)
+	if (pos <= mid) {
 		ch[u][0] = add(pos, v, ch[u][0], l, mid);
-	else
+		G[u].emplace_back(ch[u][0]);
+		++inEdge[ch[u][0]];
+	}
+	else {
 		ch[u][1] = add(pos, v, ch[u][1], mid + 1, r);
+		G[u].emplace_back(ch[u][1]);
+		++inEdge[ch[u][1]];
+	}
 	return u;
 }
 void query(int st, int L, int R, int u, int l = 1, int r = n)
 {
+	if (!u) return;
 	if (L <= l && r <= R) {
-		G[st].emplace_back(id[u]);
-//		printf("%d->%d\n", st, id[u]);
-		++inEdge[id[u]];
+		G[st].emplace_back(u);
+		++inEdge[u];
 		return;
 	}
 	int mid = l + r >> 1;
@@ -172,6 +159,7 @@ int main(void)
 {
 	int T; read >> T;
 	while (T--) {
+		std::memset(inEdge, 0, sizeof inEdge);
 		scanf("%s", str + 1);
 		n = strlen(str + 1);
 		buildSA();
@@ -199,12 +187,10 @@ int main(void)
 		auto cmpb = [](PII a, PII b) { return lenb[a.second] > lenb[b.second]; };
 		std::sort(control.begin(), control.end(), cmpb);
 		int pos = 1;
-		buildSeg();
-		root = 1;
+		root = 0;
 		for (auto t : control) {
 			while (pos <= lena[a[pos]] && lena[a[pos]] >= lenb[t.second]) {
 				root = add(rk[la[a[pos]]], a[pos], root);
-//				printf("add(%d, %d)\n", rk[la[a[pos]]], a[pos]);
 				++pos;
 			}
 
@@ -227,7 +213,6 @@ int main(void)
 			}
 			int right = l;
 
-//			printf("%d->(%d, %d), len = %d\n", t.first, left, right, lenb[t.second]);
 			query(t.first, left, right, root);
 		}
 		printf("%lld\n", toposort());
