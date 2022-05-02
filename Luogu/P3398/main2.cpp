@@ -32,24 +32,31 @@ void initLCA(int u)
 			initLCA(v);
 		}
 }
-inline std::pair<int, int> LCA(int u, int v)
+inline int LCA(int u, int v)
 {
-	int res = dep[u] + dep[v];
 	if (dep[u] < dep[v])
 		std::swap(u, v);
 	for (int k = LG - 1; k >= 0; --k)
 		if (dep[fa[u][k]] >= dep[v])
 			u = fa[u][k];
 	if (u == v)
-		return std::make_pair(u, res - 2 * dep[u]);
+		return u;
 	for (int k = LG - 1; k >= 0; --k)
 		if (fa[u][k] != fa[v][k]) {
 			u = fa[u][k];
 			v = fa[v][k];
 		}
-	return std::make_pair(fa[u][0], res - 2 * dep[fa[u][0]]);
+	return fa[u][0]	;
 }
 
+inline bool check(int a, int b, int c, int d)
+{
+	int lca = LCA(a, b);
+	int x = LCA(c, d);
+	if (LCA(x, a) != lca)
+		std::swap(a, b);
+	return (LCA(x, a) == lca && LCA(x, b) == x);
+}
 int main(void)
 {
 	read >> n >> m;
@@ -62,10 +69,7 @@ int main(void)
 	while (m--) {
 		int a, b, c, d;
 		read >> a >> b >> c >> d;
-		auto lca1 = LCA(a, b), lca2 = LCA(c, d);
-		bool flag1 = LCA(lca2.first, a).second + LCA(lca2.first, b).second == lca1.second;
-		bool flag2 = LCA(lca1.first, c).second + LCA(lca1.first, d).second == lca2.second;
-		puts(flag1 || flag2 ? "Y" : "N");
+		puts((check(a, b, c, d) || check(c, d, a, b)) ? "Y" : "N");
 	}
 	return 0;
 }
