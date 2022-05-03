@@ -70,6 +70,7 @@ namespace dinic
 		int rest = flow;
 		for (int e = now[u]; rest && e; e = nex[e])
 			if (fl[e] && d[to[e]] == d[u] + 1) {
+				now[u] = e;
 				int tmp = dfs(to[e], std::min(rest, fl[e]));
 				if (!tmp) d[to[e]] = 0;
 				rest -= tmp;
