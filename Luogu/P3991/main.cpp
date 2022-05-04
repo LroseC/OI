@@ -24,7 +24,6 @@ struct node
 {
 	int w, l, r;
 	int v[4];
-	int a, b, c;
 	int cnt;
 	i64 sz, f[4][4], of[4][4];
 } tr[N << 2];
@@ -76,7 +75,7 @@ int merge(int x, int y)
 		return y;
 	}
 }
-std::pair<int, int> split(int u, int x)
+std::pair<int, int> split(int u, i64 x)
 {
 	if (!u) return std::make_pair(0, 0);
 	if (tr[tr[u].l].sz >= x) {
@@ -106,7 +105,8 @@ int main(void)
 	read >> n;
 	i64 last = 0;
 	while (n--) {
-		int p, a, b, c, x;
+		int a, b, c, x;
+		i64 p;
 		read >> p >> a >> b >> c >> x;
 		auto t = split(root, p);
 		root = merge(t.first, merge(New(a, b, c, x), t.second));
