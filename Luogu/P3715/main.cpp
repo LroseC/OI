@@ -16,7 +16,7 @@ struct FSI
 } read;
 
 using i64 = long long;
-const int mod = 1e9 + 7, S =  110, N = 60;
+const int mod = 1e9 + 7, S = 110, N = 60;
 inline int Mod(int x) { return x >= mod ? x - mod : x; }
 
 struct ModInt
@@ -26,9 +26,9 @@ struct ModInt
 	ModInt(void) {}
 	ModInt(int x) { val = x; }
 	ModInt operator+(const ModInt &other) const
-	{ return val + other.val; }
+	{ return Mod(val + other.val); }
 	ModInt operator-(const ModInt &other) const
-	{ return val + mod - other.val; }
+	{ return Mod(val + mod - other.val); }
 	ModInt operator*(const ModInt &other) const
 	{ return 1ll * val * other.val % mod; }
 };
@@ -120,6 +120,8 @@ void build(void)
 			}
 		}
 	}
+	for (int i = 0; i <= idx; ++i)
+		end[i] |= end[fail[i]];
 }
 void init(void)
 {
@@ -138,20 +140,28 @@ void init(void)
 }
 Matrix initMatrix(void)
 {
-	Matrix base(idx + 1, idx + 1);
+	Matrix base((idx + 1) << 1, (idx + 1) << 1);
 	for (int u = 0; u <= idx; ++u) {
 		if (end[u]) continue;
 		for (int i = 1; i <= n; ++i) {
-			int t = ch[u][basis[i][1] - 'a'];
-			if (!end[t]) base[u][t] = base[u][t] + 1;
+			if (len[i] == 1 && flag[u][i]) {
+				int t = to[u][i];
+				base[u][t] = base[u][t] + 1;
+			}
+			if (len[i] == 2 && flag[u][i]) {
+				int t = to[u][i] + idx + 1;
+				base[u][t] = base[u][t] + 1;
+			}
 		}
 	}
+	for (int u = 0; u <= idx; ++u)
+		base[u + idx + 1][u] = base[u + idx + 1][u] + 1;
 	return base;
 }
 void Matrixmain(void)
 {
 	Matrix base = initMatrix();
-	Matrix res(1, idx + 1);
+	Matrix res(1, 2 * (idx + 1));
 	res[0][0] = 1;
 	res = res * qpow(base, L);
 	ModInt ans = 0;
@@ -167,24 +177,24 @@ int main(void)
 	for (int i = 1; i <= n; ++i) {
 		scanf("%s", basis[i] + 1);
 		len[i] = std::strlen(basis[i] + 1);
-		if (len[i] != 1) checkMatrix = 0;
+		if (len[i] > 2) checkMatrix = 0;
 	}
 	for (int i = 1; i <= m; ++i) {
 		scanf("%s", tmp + 1);
 		insert(tmp + 1);
 	}
 	build();
+	init();
 	if (checkMatrix) {
 		Matrixmain();
 		return 0;
 	}
-	init();
 	f[0][0] = 1;
 	for (int l = 0; l <= L; ++l)
 		for (int u = 0; u <= idx; ++u)
 			if (f[l][u].val)
 				for (int i = 1; i <= n; ++i)
-					if (flag[u][i])
+					if (flag[u][i] && l + len[i] <= L)
 						f[l + len[i]][to[u][i]] = f[l + len[i]][to[u][i]] + f[l][u];
 	ModInt res = 0;
 	for (int u = 0; u <= idx; ++u)
