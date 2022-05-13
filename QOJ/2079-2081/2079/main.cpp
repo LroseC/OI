@@ -21,6 +21,17 @@ const int N = 1e5 + 10;
 int n, m;
 int a[N];
 
+struct floor
+{
+	int val;
+	floor(int x) { val = x; }
+	floor operator/(const floor &other) const
+	{
+		if (val < 0 && val % other.val)
+			return val / other.val - 1;
+		return val / other.val;
+	}
+};
 struct segNode
 {
 	i64 sum;
@@ -86,15 +97,17 @@ void segAdd(int L, int R, int v, int u = 1, int l = 0, int r = n - 1)
 void segDev(int L, int R, int v, int u = 1, int l = 0, int r = n - 1)
 {
 	if (l == r) {
-		int val = tr[u].sum;
-		if (val < 0 && val % v)
-			val = val / v - 1;
-		else
-			val = val / v;
+		int val = ((floor)tr[u].sum / v).val;
 		tr[u].sum = tr[u].max = tr[u].min = val;
 		return;
 	}
 	if (L <= l && r <= R) {
+		int delMax = tr[u].max - ((floor)tr[u].max / v).val;
+		int delMin = tr[u].min - ((floor)tr[u].min / v).val;
+		if (delMax == delMin) {
+			nodeAdd(u, l, r, -delMax);
+			return;
+		}
 		int mid = l + r >> 1;
 		spread(u, l, r);
 		segDev(L, R, v, u << 1, l, mid);
