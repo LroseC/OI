@@ -1,5 +1,9 @@
+#include <cmath>
+#include <vector>
 #include <cctype>
 #include <cstdio>
+#include <cstring>
+#include <algorithm>
 
 struct FSI
 {
@@ -14,15 +18,55 @@ struct FSI
 } read;
 
 using i64 = long long;
+const int N = 1010, mod = 31011;
 
+struct Edge
+{
+	int u, v, w;
+
+	Edge(void) {}
+	Edge(int _u, int _v, int _w) { u = _u, v = _v, w = _w; }
+	bool operator<(const Edge &other) const
+	{ return w < other.w; }
+};
+
+int n, m;
+int f[N], fa[N];
+int ma[N][N];
+int scc[N], id[N], sccCnt;
+std::vector<Edge> edge, MST;
+
+int find(int u) { return fa[u] == u ? u : fa[u] = find(fa[u]); }
 void add(int u, int v)
 {
 	++ma[u][u];
 	--ma[u][v];
 }
 
-int m_tree(void)
+int m_tree(int n)
 {
+	int res = 1;
+	--n;
+	for (int i = 0; i < n; ++i) {
+		int t = i;
+		for (int j = i + 1; j < n; ++j)
+			if (abs(ma[j][i]) > abs(ma[t][i])) t = j;
+		if (i != t) res *= -1;
+		for (int j = 0; j < n; ++j)
+			std::swap(ma[i][j], ma[t][j]);
+		for (int j = i + 1; j < n; ++j)
+			while (ma[j][i]) {
+				int tmp = ma[i][i] / ma[j][i];
+				for (int k = 0; k < n; ++k)
+					ma[i][k] = (ma[i][k] - 1ll * tmp * ma[j][k]) % mod;
+				res *= -1;
+				for (int k = 0; k < n; ++k)
+					std::swap(ma[i][k], ma[j][k]);
+			}
+	}
+	for (int i = 0; i < n; ++i)
+		res = 1ll * res * ma[i][i] % mod;
+	return (res + mod) % mod;
 }
 
 int main(void)
@@ -33,6 +77,7 @@ int main(void)
 		edge.emplace_back(u, v, w);
 	}
 	std::sort(edge.begin(), edge.end());
+	for (int i = 1; i <= n; ++i) fa[i] = i;
 	for (auto e : edge)
 		if (find(e.u) != find(e.v)) {
 			int u = find(e.u);
