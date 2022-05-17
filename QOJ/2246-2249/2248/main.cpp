@@ -87,14 +87,17 @@ void solve(void)
 	toposort();
 	PII res = std::make_pair(0, 1);
 	//first->cnt, second->res;
+	bool flag = 1;
 	for (int i = 1; i <= n; ++i)
 		if (!G[i].size())
 			res = merge(res, f[i]);
 	for (int i = 1; i <= n; ++i) {
 		G[i].clear();
+		if (inEdge[i])
+			flag = 0;
 		inEdge[i] = 0;
 	}
-	printf("%d\n", res.second);
+	printf("%d\n", flag ? res.second : 0);
 }
 
 int main(void)

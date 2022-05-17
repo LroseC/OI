@@ -30,6 +30,13 @@ inline double getIntersect(PII a, PII b)
 void insert(int k, int b, std::deque<PII>& q)
 {
 	auto now = std::make_pair(k, b);
+	if (q.size() == 1) {
+		if (q[0].first == k)
+			q[0].second = std::min(q[0].second, b);
+		else
+			q.emplace_back(now);
+		return;
+	}
 	int sz = q.size();
 	while (sz >= 2 && getIntersect(q[sz - 2], q[sz - 1]) >= getIntersect(q[sz - 2], now)) {
 		--sz;
@@ -54,7 +61,7 @@ void CDQ(int l, int r)
 		int x = per[i];
 		for (int j = 1; j <= maxC; ++j) {
 			auto &t = q[j][x % j];
-			while (t.size() > 1 && getIntersect(t[0], t[1]) < x)
+			while (t.size() > 1 && getIntersect(t[0], t[1]) < x / j)
 				t.pop_front();
 			if (t.size())
 				dis[x] = std::min(dis[x], t[0].first * (x / j) + t[0].second);
@@ -87,7 +94,7 @@ int main(void)
 		per[i] = i;
 	CDQ(0, n);
 	for (int i = 1; i <= n; ++i)
-		printf("%d ", dis[i] == dis[N - 1] ? -1 : dis[i]);
+		printf("%d\n", dis[i] == dis[N - 1] ? -1 : dis[i]);
 	puts("");
 	return 0;
 }
