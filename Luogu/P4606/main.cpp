@@ -123,8 +123,11 @@ void solve(void)
 		auto cmp = [](int a, int b)
 		{ return id[a] < id[b]; };
 		std::sort(city.begin(), city.end(), cmp);
+		int lca = city[0];
+		for (int i = 1; i < sz; ++i)
+			lca = LCA(lca, city[i]);
 		int top = 0;
-		stk[++top] = 1;
+		stk[++top] = lca;
 		int res = 0;
 		for (auto u : city) {
 			int d = LCA(stk[top], u);
@@ -140,7 +143,7 @@ void solve(void)
 			}
 			stk[++top] = u;
 		}
-		res += dis[stk[top]];
+		res += dis[stk[top]] - dis[fa[lca]];
 		printf("%d\n", res - sz);
 	}
 }
