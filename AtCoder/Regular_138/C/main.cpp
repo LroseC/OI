@@ -27,10 +27,6 @@ int main(void)
 	}
 	auto cmp = [&](int x, int y) { return a[x] > a[y]; };
 	std::sort(b.begin(), b.end(), cmp);
-	for (int i = 0; i < n; ++i) {
-		printf("%d ", b[i]);
-	}
-	puts("");
 	i64 res = 0;
 	for (int i = 0; i < n / 2; ++i) {
 		sum[b[i] + 1] = 1;
