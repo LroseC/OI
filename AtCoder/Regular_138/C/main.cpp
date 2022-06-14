@@ -26,7 +26,7 @@ int main(void)
 		b[i] = i;
 	}
 	auto cmp = [&](int x, int y) { return a[x] > a[y]; };
-	std::sort(b.begin(), b.end(), cmp);
+	std::nth_element(b.begin(), b.begin() + n / 2, b.end(), cmp);
 	i64 res = 0;
 	for (int i = 0; i < n / 2; ++i) {
 		sum[b[i] + 1] = 1;
