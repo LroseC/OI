@@ -21,7 +21,7 @@ using i64 = long long;
 using PII = std::pair<int, int>;
 const int N = 1e5 + 10, M = 1e6 + 10;
 
-int n, K, S = N - 1, T = N - 2;
+int n, K, S = N - 1, T = N - 2, SS = N - 3;
 PII line[N];
 int idx = 1, head[N], nex[M], to[M], fl[M], w[M];
 
@@ -41,7 +41,7 @@ namespace dinic
 {
 	bool vis[N];
 	int dis[N], now[N];
-	void SPFA(void)
+	bool SPFA(void)
 	{
 		std::queue<int> q;
 		std::memset(dis, 0xcf, sizeof dis);
@@ -73,9 +73,13 @@ namespace dinic
 			if (fl[e] && dis[to[e]] == dis[u] + w[e] && !vis[to[e]]) {
 				now[u] = e;
 				int tmp = dfs(to[e], std::min(rest, fl[e]), cost);
-				if (!tmp) 
+				if (!tmp) dis[to[e]] = 0xcfcfcfcf;
+				rest -= tmp;
+				fl[e] -= tmp;
+				fl[e ^ 1] += tmp;
 			}
 		vis[u] = 0;
+		return flow - rest;
 	}
 	void main(int &res, int &cost)
 	{
@@ -88,15 +92,16 @@ namespace dinic
 int main(void)
 {
 	read >> n >> K;
+	addFlow(S, SS, K, 0);
 	for (int i = 1; i <= n; ++i) {
 		read >> line[i].first >> line[i].second;
-		addFlow(S, line[i].first, 1, 0);
+		addFlow(SS, line[i].first, 1, 0);
 		addFlow(line[i].second, T, 1, 0);
 		addFlow(line[i].first, line[i].second, 1, line[i].second - line[i].first);
 	}
 	for (int i = 1; i <= n; ++i) {
 		for (int j = 1; j <= n; ++j) {
-			if (line[i].second < line[j].first) {
+			if (line[i].second <= line[j].first) {
 				addFlow(line[i].second, line[j].first, 1, 0);
 			}
 		}
