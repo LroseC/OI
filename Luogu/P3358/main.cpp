@@ -1,5 +1,9 @@
+#include <queue>
 #include <cctype>
 #include <cstdio>
+#include <climits>
+#include <cstring>
+#include <algorithm>
 
 struct FSI
 {
@@ -17,9 +21,9 @@ using i64 = long long;
 using PII = std::pair<int, int>;
 const int N = 1e5 + 10, M = 1e6 + 10;
 
-int n, K;
+int n, K, S = N - 1, T = N - 2;
 PII line[N];
-int head[N], nex[M], to[M], fl[M], w[M];
+int idx = 1, head[N], nex[M], to[M], fl[M], w[M];
 
 void addEdge(int u, int v, int f, int wi)
 {
