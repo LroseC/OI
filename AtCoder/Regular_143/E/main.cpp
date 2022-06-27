@@ -25,5 +25,12 @@ int main(void)
 {
 	//Think twice, code once.
 	std::ios::sync_with_stdio(false);
+	std::cin >> n;
+	for (int i = 1; i < n; ++i) {
+		int u, v;
+		std::cin >> u >> v;
+		G[u].emplace_back(v);
+		G[v].emplace_back(u);
+	}
 	return 0;
 }
