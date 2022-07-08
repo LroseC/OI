@@ -1,3 +1,4 @@
+#include <queue>
 #include <vector>
 #include <cctype>
 #include <cstdio>
@@ -22,5 +23,17 @@ using PII = std::pair<int, int>;
 int main(void)
 {
 	//Think twice, code once.
+	int n; read >> n;
+	std::priority_queue<int> heap;
+	i64 ans = 0;
+	for (int i = 1; i <= n; ++i) {
+		int x; read >> x;
+		x -= i;
+		heap.emplace(x);
+		heap.emplace(x);
+		ans += heap.top() - x;
+		heap.pop();
+	}
+	printf("%lld\n", ans);
 	return 0;
 }
