@@ -1,5 +1,7 @@
+#include <vector>
 #include <cctype>
 #include <cstdio>
+#include <algorithm>
 
 struct FSI
 {
@@ -14,8 +16,11 @@ struct FSI
 } read;
 
 using i64 = long long;
+using vint = std::vector<int>;
+using PII = std::pair<int, int>;
 
 int main(void)
 {
+	//Think twice, code once.
 	return 0;
 }
