@@ -8,6 +8,7 @@ using PII = std::pair<int, int>;
 
 int main(void)
 {
+	//Think twice, code once.
 	std::ios::sync_with_stdio(false);
 	return 0;
 }
