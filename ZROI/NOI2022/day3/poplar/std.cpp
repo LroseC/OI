@@ -23,7 +23,7 @@ const int N = 55, M = 2005;
 
 int n, m, Q;
 int w[N], v[N];
-i64 f[101][N][M];
+i64 f[64][N][M];
 int sz[N], del[N], fa[N];
 int G[N][N];
 vint OG[N], T[N];
