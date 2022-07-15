@@ -77,14 +77,11 @@ void dp(int u, int dep)
 		for (int i = std::max(0, -delt); i <= n; ++i) {
 			int tos = s | 1 << dep, toi = i + delt;
 			for (int j = w[u]; j <= m; ++j) {
-//				if (f[s][i][j - w[u]] || (j - w[u] == 0 && s == 0 && i == 0)) {
-//					maxx(f[tos][toi][j], f[s][i][j - w[u]] + v[u]);
-//				}
 				maxx(f[tos][toi][j], f[s][i][j - w[u]] + v[u]);
 			}
 		}
 	}
-	
+
 	for (int v : T[u])
 		dp(v, dep + 1);
 	for (int s = 0; s < 1 << dep; ++s) {
