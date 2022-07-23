@@ -13,5 +13,13 @@ int main(void)
 {
 	//Think twice, code once.;
 	std::ios::sync_with_stdio(false);
+	i32 tt; read >> tt;
+	while (tt--) {
+		i32 x, y; read >> x >> y;
+		if (y % x != 0) puts("0 0");
+		else {
+			printf("1 %d\n", y / x);
+		}
+	}
 	return 0;
 }

@@ -11,7 +11,9 @@ using PII = std::pair<i32, i32>;
 
 int main(void)
 {
-	//Think twice, code once.;
+	//Think twice, code once.
+#ifndef DEBUG
 	std::ios::sync_with_stdio(false);
+#endif
 	return 0;
 }

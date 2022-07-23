@@ -1,4 +1,5 @@
 #include <vector>
+#include <cstring>
 #include <climits>
 #include <iostream>
 #include <algorithm>
@@ -11,7 +12,7 @@ using PII = std::pair<i32, i32>;
 
 int main(void)
 {
-	//Think twice, code once.;
+	//Think twice, code once.
 	std::ios::sync_with_stdio(false);
 	return 0;
 }
