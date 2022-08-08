@@ -2,6 +2,8 @@
 #include<cstdio>
 
 int32_t main(void){
+	freopen("test.in", "r", stdin);
+	freopen("test.out", "w", stdout);
 	uint32_t subId,n,opt,t;
 	scanf("%u%u%u%u",&subId,&n,&opt,&t);
 	vector<pair<uint32_t,uint32_t>> V;
