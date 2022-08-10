@@ -23,7 +23,7 @@ using vi32 = std::vector<i32>;
 using PII = std::pair<int, int>;
 const int N = 5e5 + 10, M = 4e6 + 10;
 
-i32 n, m, idx, cnt, dfnCnt;
+i32 n, m, idx = 1, cnt, dfnCnt;
 i32 dfn[N], low[N], id[N];
 i32 head[N], to[M], nex[M], isCut[M];
 vi32 ver[N];
