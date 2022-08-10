@@ -19,8 +19,8 @@ using i32 = int;
 using u32 = unsigned int;
 using i64 = long long;
 using u64 = unsigned long long;
-using vint = std::vector<int>;
-using PII = std::pair<int, int>;
+using vi32 = std::vector<i32>;
+using PII = std::pair<i32, i32>;
 
 int main(void)
 {
