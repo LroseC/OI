@@ -1,6 +1,7 @@
 #include <vector>
 #include <cctype>
 #include <cstdio>
+#include <cstdint>
 #include <algorithm>
 
 struct FSI
