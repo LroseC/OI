@@ -15,10 +15,10 @@ struct FSI
 	}
 } read;
 
-using i32 = int;
-using u32 = unsigned int;
-using i64 = long long;
-using u64 = unsigned long long;
+using i32 = int32_t;
+using i64 = int64_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
 using vi32 = std::vector<i32>;
 using PII = std::pair<i32, i32>;
 
