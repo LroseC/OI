@@ -1,0 +1,58 @@
+#include <vector>
+#include <cctype>
+#include <cstdio>
+#include <cstdint>
+#include <algorithm>
+#include <functional>
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { if (ch == '-') f = -1; ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + (ch - '0') * f; ch = getchar(); }
+		return *this;
+	}
+} read;
+
+using i32 = int32_t;
+using i64 = int64_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
+using vi32 = std::vector<i32>;
+using PII = std::pair<i32, i32>;
+const int N = 1e3 + 10;
+
+i32 n, K;
+std::vector<PII> G[N];
+std::vector<i64> ans;
+
+void dfs(i32 u, i32 fa, i64 dis, i32 rt)
+{
+	if (u > rt) ans.emplace_back(dis);
+	for (auto e : G[u])
+		if (e.first != fa) {
+			dfs(e.first, u, dis + e.second, rt);
+		}
+}
+
+int main(void)
+{
+	//Think twice, code once.
+	read >> n >> K;
+	for (int i = 1; i < n; ++i) {
+		i32 u, v, w;
+		read >> u >> v >> w;
+		G[u].emplace_back(v, w);
+		G[v].emplace_back(u, w);
+	}
+	for (int i = 1; i <= n; ++i) {
+		dfs(i, i, 0, i);
+	}
+	std::sort(ans.begin(), ans.end(), std::greater<i64>());
+	for (int i = 0; i < K; ++i)
+		printf("%lld\n", ans[i]);
+	return 0;
+}

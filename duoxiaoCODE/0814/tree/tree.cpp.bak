@@ -1,0 +1,242 @@
+#include <set>
+#include <vector>
+#include <cctype>
+#include <cstdio>
+#include <cstdint>
+#include <cstring>
+#include <algorithm>
+#include <functional>
+
+#define getchar() (p1==p2&&(p2=(p1=buf)+fread(buf,1,100000,stdin),p1==p2)?EOF:*p1++)
+static char buf[1000000],*p1=buf,*p2=buf;
+
+struct FSI
+{
+	template<typename T>
+	FSI& operator>>(T &res)
+	{
+		res = 0; T f = 1; char ch = getchar();
+		while (!isdigit(ch)) { ch = getchar(); }
+		while (isdigit(ch)) { res = res * 10 + ch - '0'; ch = getchar(); }
+		return *this;
+	}
+} read;
+struct FSO
+{
+	FSO& operator<<(long long x)
+	{
+		static char buf[64];
+		int top = -1;
+		if (x < 0) {
+			x = -x;
+			putchar('-');
+		}
+		if (x == 0) {
+			putchar('0');
+		}
+		while (x) {
+			buf[++top] = x % 10 + '0';
+			x /= 10;
+		}
+		while (~top) {
+			putchar(buf[top--]);
+		}
+		putchar('\n');
+		return *this;
+	}
+} write;
+
+using i32 = int;
+using i64 = long long;
+using u32 = uint32_t;
+using u64 = uint64_t;
+using vi32 = std::vector<i32>;
+using PII = std::pair<i32, i32>;
+const int N = 2e5 + 10, M = 6e5 + 10;
+
+i32 n, K, RT, idx;
+bool del[N];
+i32 sz[N];
+i64 maxlen;
+i32 T[N], G[N], to[M], w[M], nex[M];
+std::vector<i64> my[N], son[N], ans;
+
+inline void add(i32 head[], i32 u, i32 v, i32 wi = 0)
+{
+	idx += 1;
+	nex[idx] = head[u];
+	head[u] = idx;
+	to[idx] = v, w[idx] = wi;
+}
+
+void getSz(i32 u, i32 fa)
+{
+	sz[u] = 1;
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]] && to[e] != fa) {
+			getSz(to[e], u);
+			sz[u] += sz[to[e]];
+		}
+}
+void getRoot(i32 u, i32 fa, i32 allnode, i32 &root, i32 &minSize)
+{
+	i32 maxSz = 0;
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]] && to[e] != fa) {
+			getRoot(to[e], u, allnode, root, minSize);
+			maxSz = std::max(maxSz, sz[to[e]]);
+		}
+	maxSz = std::max(maxSz, allnode - sz[u]);
+	if (maxSz < minSize) {
+		root = u;
+		minSize = maxSz;
+	}
+}
+void getDis(i32 u, i32 fa, i64 dis, std::vector<i64> &ds, i32 &top)
+{
+	ds[top++] = dis;
+	for (i32 e = G[u]; e; e = nex[e])
+		if (to[e] != fa && !del[to[e]]) {
+			getDis(to[e], u, dis + w[e], ds, top);
+		}
+}
+void buildTree(i32 u)
+{
+	getSz(u, u);
+	my[u].resize(sz[u]);
+	i32 tp = 0;
+	getDis(u, u, 0, my[u], tp);
+	std::sort(my[u].begin(), my[u].end());
+	if (my[u].size() > 1) {
+		maxlen = std::max(maxlen, my[u][my[u].size() - 1] + my[u][my[u].size() - 2]);
+	}
+	del[u] = 1;
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]]) {
+			i32 root, minSize = 0x3f3f3f3f;
+			getRoot(to[e], u, sz[to[e]], root, minSize);
+			son[root].resize(sz[to[e]]);
+			i32 top = 0;
+			getDis(to[e], u, w[e], son[root], top);
+			std::sort(son[root].begin(), son[root].end());
+			add(T, u, root);
+		}
+	for (i32 e = T[u]; e; e = nex[e])
+		buildTree(to[e]);
+}
+inline i64 calc(std::vector<i64> &vec, i64 x)
+{
+	i64 res = 0;
+	for (i32 i = 0, j = vec.size(); i < vec.size(); ++i) {
+		while (i < j - 1 && vec[i] + vec[j - 1] >= x) --j;
+		res += vec.size() - std::max(i + 1, j);
+	}
+	return res;
+}
+i64 getAns(i32 u, i64 x)
+{
+	i64 res = 0;
+	res += calc(my[u], x);
+	for (i32 e = T[u]; e; e = nex[e]) {
+		res -= calc(son[to[e]], x);
+	}
+	for (i32 e = T[u]; e; e = nex[e]) {
+		res += getAns(to[e], x);
+	}
+	return res;
+}
+inline bool check(i64 x)
+{
+	return getAns(RT, x) >= K;
+}
+std::multiset<i64> S;
+void getDis2(i32 u, i32 fa, i64 dis, i64 x)
+{
+	auto it = S.end();
+	--it;
+	while (*it + dis >= x) {
+		ans.emplace_back(*it + dis);
+		if (it == S.begin()) break;
+		--it;
+	}
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]] && to[e] != fa) {
+			getDis2(to[e], u, dis + w[e], x);
+		}
+}
+void inst(i32 u, i32 fa, i64 dis)
+{
+	S.insert(dis);
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]] && to[e] != fa) {
+			inst(to[e], u, dis + w[e]);
+		}
+}
+void getRes(i32 u, i64 x)
+{
+	del[u] = 1;
+	S.clear();
+	S.insert(0);
+	for (i32 e = G[u]; e; e = nex[e])
+		if (!del[to[e]]) {
+			getDis2(to[e], u, w[e], x);
+			inst(to[e], u, w[e]);
+		}
+	for (i32 e = T[u]; e; e = nex[e])
+		getRes(to[e], x);
+}
+
+int main(void)
+{
+	//Think twice, code once.
+#ifndef DEBUG
+	freopen("tree.in", "r", stdin);
+	freopen("tree.out", "w", stdout);
+#endif
+	read >> n >> K;
+	for (int i = 1; i < n; ++i) {
+		i32 u, v, w;
+		read >> u >> v >> w;
+		add(G, u, v, w);
+		add(G, v, u, w);
+	}
+	i32 root, minSize = 0x3f3f3f3f;
+	getSz(1, 1);
+	getRoot(1, 1, n, root, minSize);
+	buildTree(root);
+	RT = root;
+	i64 l = 0, r = maxlen;
+	while (l < r) {
+		i64 mid = l + r + 1 >> 1;
+		if (check(mid)) l = mid;
+		else r = mid - 1;
+	}
+	std::memset(del, 0, sizeof del);
+	getRes(RT, l + 1);
+	while (ans.size() < K) ans.emplace_back(l);
+	std::sort(ans.begin(), ans.end(), std::greater<i64>());
+	for (auto v : ans)
+		write << v;
+	return 0;
+}
+/*
+   想不到单 log 做法, 写一个 log^2 做法.
+   2log 能否过 2e5, 我们拭目以待.
+   话说他们评测机是什么速度啊, 应该不会比我的笔记本还慢把.
+   点分治本来就是 2log 啊, 那没事了, 感觉应该不会过不了把.
+   过不了就裂开了.
+   感觉这题应该有 1log 做法, 类似超级钢琴那样的, 不然 K 没必要限制在 2e5 范围内.
+   除非出题人是诈骗大师.
+   好像开不起来 O2? 那我寄了, 我开了 O2 能跑进 1s, 不开 10s 开外.
+   要爆零了/ll
+   摆烂!!!!!!!!
+   手动开的 O2 好像更慢, 跑不进 1s 了.
+   如果评测机慢, 大概就要裂开了把?
+   从此以后, 大概就有一个大常数战士花 2h 打码 + 对拍最终喜提暴力分的故事了吧?
+   希望人没事.
+   好像手动开的 O2 过不了极限点, 裂了.
+   貌似没得 O2 用哦...
+   改掉两个锅之后不开 O2 20 分, 把 vector 的 emplace_back 改掉 喜提 40 分.
+   然后把 vector 存图换成链式前向星, 有 85 了!
+   现在就是微小的常数差距.
+*/
