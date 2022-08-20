@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstdio>
+#include <cstdint>
 #include <algorithm>
 
 struct FSI
@@ -14,15 +15,15 @@ struct FSI
 	}
 } read;
 
-using i32 = int;
-using i64 = long long;
+using i32 = int32_t;
+using i64 = int64_t;
 using PII = std::pair<i32, i32>;
 
 int main(void)
 {
 #ifndef DEBUG
-	freopen("splay.in", "r", stdin);
-	freopen("splay.out", "w", stdout);
+	freopen(".in", "r", stdin);
+	freopen(".out", "w", stdout);
 #endif
 	//Think twice, code once.
 	return 0;
